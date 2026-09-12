@@ -571,6 +571,31 @@ export const PremiumTeaserCard: React.FC<PremiumTeaserCardProps> = ({
         )}
       </div>
 
+      {/* 対応決済手段の視覚的バッジ */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-3 space-y-2">
+        <div className="flex items-center justify-between text-[11px]">
+          <span className="text-amber-300 font-bold flex items-center gap-1">
+            <Zap className="w-3 h-3 text-amber-400" />
+            1タップ決済・複数のお支払いに対応
+          </span>
+          <span className="text-slate-400 text-[10px]">面倒なカード入力不要</span>
+        </div>
+        <div className="grid grid-cols-4 gap-1.5 text-center text-[10px] font-bold">
+          <div className="py-1 px-1 rounded-lg bg-black/40 border border-white/10 text-white flex items-center justify-center gap-1">
+            <span>🍎 Apple Pay</span>
+          </div>
+          <div className="py-1 px-1 rounded-lg bg-black/40 border border-white/10 text-white flex items-center justify-center gap-1">
+            <span>📱 G Pay</span>
+          </div>
+          <div className="py-1 px-1 rounded-lg bg-rose-500/20 border border-rose-400/30 text-rose-200 flex items-center justify-center gap-1">
+            <span>🔴 PayPay</span>
+          </div>
+          <div className="py-1 px-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-200 flex items-center justify-center gap-1">
+            <span>💳 各種カード</span>
+          </div>
+        </div>
+      </div>
+
       {/* 購入ボタン */}
       <button
         type="button"
@@ -592,12 +617,15 @@ export const PremiumTeaserCard: React.FC<PremiumTeaserCardProps> = ({
         )}
       </button>
 
-      <div className="space-y-1 text-center">
+      <div className="space-y-1.5 text-center">
         <p className="text-xs font-bold text-amber-300">
           ※追加請求なし・1回限りの完全買い切りです（月額課金・自動更新等は一切ありません）
         </p>
-        <p className="text-[11px] text-slate-400">
-          Apple Pay / Google Pay / クレジットカード対応。ご購入後はこのページで永久にご覧いただけます。
+        <p className="text-[11px] text-slate-400 leading-relaxed">
+          Face ID / Touch ID で認証するだけですぐ読めます。ご購入後はこのページで永久にご覧いただけます。
+        </p>
+        <p className="text-[10px] text-slate-500">
+          ※LINEアプリ内等でApple Payが出ない場合は、画面右下メニュー「Safari/Chromeで開く」を選ぶとワンタップ決済が可能です。
         </p>
       </div>
     </div>
