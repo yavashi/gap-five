@@ -46,6 +46,15 @@ export default function DiagnosePage() {
       try {
         const result = await createHostSession(nickname, answersArray);
         if (result.success) {
+          try {
+            localStorage.setItem(
+              'gap_recent_session',
+              JSON.stringify({
+                sessionId: result.sessionId,
+                nickname: nickname.trim(),
+              })
+            );
+          } catch {}
           router.push(`/me/${result.sessionId}`);
         }
       } catch (err: any) {

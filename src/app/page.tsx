@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Sparkles, Users, ArrowRight } from 'lucide-react';
+import { RecentSessionCard } from '@/components/RecentSessionCard';
 
 export default function HomePage() {
   return (
@@ -22,12 +23,15 @@ export default function HomePage() {
           10問の自己診断と、友人たちからの他者評価であなたの「真の二つ名」を解き明かします。
         </p>
 
-        <div className="pt-4">
+        {/* 前回の診断復帰カード */}
+        <RecentSessionCard />
+
+        <div className="pt-2">
           <Link
             href="/diagnose"
             className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            <span>診断をはじめる（約1分）</span>
+            <span>新しい診断をはじめる（約1分）</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { getSession, isHostOfSession } from '@/lib/actions/session';
 import { getPeerAnswers } from '@/lib/actions/peer';
 import { ShareButtons } from '@/components/ShareButtons';
-import { Sparkles, Users, Lock, Unlock, ArrowRight, ShieldCheck, MessageSquare } from 'lucide-react';
+import { Sparkles, Users, Lock, Unlock, ArrowRight, ShieldCheck, MessageSquare, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
 interface MePageProps {
@@ -66,6 +66,29 @@ export default async function MePage({ params }: MePageProps) {
             <p className="text-xs text-blue-100/80 pt-1">
               ※他者の回答が集まると、隠された「実態の二つ名」がアンロックされます。
             </p>
+          </div>
+        </div>
+ 
+        {/* URL保存・迷子防止ヘルプカード */}
+        <div className="bg-amber-50/90 rounded-3xl p-5 border border-amber-200/80 text-amber-950 space-y-2.5 shadow-xs">
+          <div className="flex items-center gap-2 font-bold text-xs text-amber-900">
+            <Bookmark className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>【大切なお願い】このページを保存してください</span>
+          </div>
+          <p className="text-xs text-amber-800 leading-relaxed">
+            友達にLINEを送っている最中にこの画面を閉じてしまっても困らないよう、
+            <strong>ブラウザのお気に入り・ブックマークに登録</strong>するか、
+            下のボタンから<strong>自分宛て（Keepメモ等）に管理URLを送信</strong>しておくことをおすすめします。
+          </p>
+          <div className="pt-1">
+            <a
+              href={`https://line.me/R/msg/text/?${encodeURIComponent(`【GAP-FIVE】${session.host_nickname}さんの診断管理ルームURL\n（回答状況・確定結果の確認用）：\n${baseUrl}/me/${sessionId}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-xs transition-colors"
+            >
+              <span>自分のLINE（Keepメモ等）にこのページを保存</span>
+            </a>
           </div>
         </div>
 
