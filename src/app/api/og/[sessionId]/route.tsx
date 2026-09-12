@@ -238,10 +238,10 @@ export async function GET(
                   backgroundColor: '#0f172a',
                 }}
               >
-                <div style={{ fontSize: '19px', fontWeight: 900, color: '#fbbf24', marginBottom: '3px' }}>
-                  「{session.self_label}」
+                <div style={{ display: 'flex', fontSize: '19px', fontWeight: 900, color: '#fbbf24', marginBottom: '3px' }}>
+                  {`「${session.self_label}」`}
                 </div>
-                <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.3 }}>
+                <div style={{ display: 'flex', fontSize: '12px', color: '#cbd5e1', lineHeight: 1.3 }}>
                   {selfInfo.desc}
                 </div>
               </div>
@@ -277,32 +277,33 @@ export async function GET(
 
               <div
                 style={{
-                  fontSize: '42px',
+                  display: 'flex',
+                  fontSize: '38px',
                   fontWeight: 900,
                   color: '#ffffff',
-                  lineHeight: 1.25,
+                  lineHeight: 1.3,
                   marginBottom: '16px',
                 }}
               >
-                {session.host_nickname} さんの性格を教えてください！
+                {`${session.host_nickname} さんの性格を教えてください！`}
               </div>
 
               <div
                 style={{
+                  display: 'flex',
                   fontSize: '20px',
-                  color: '#94a3b8',
-                  lineHeight: 1.5,
-                  marginBottom: '28px',
+                  color: '#cbd5e1',
+                  lineHeight: 1.6,
+                  marginBottom: '32px',
                 }}
               >
-                本人は<span style={{ color: '#fbbf24', fontWeight: 'bold' }}>「{session.self_label}」</span>だと思い込んでいますが、あなたから見たら本当はどう見えていますか…？
+                {`本人は「${session.self_label}」だと思い込んでいますが、あなたから見たら本当はどう見えていますか…？`}
               </div>
 
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '16px',
                 }}
               >
                 <div
@@ -315,12 +316,14 @@ export async function GET(
                     fontSize: '22px',
                     fontWeight: 900,
                     color: 'white',
+                    marginRight: '16px',
                   }}
                 >
-                  1分で匿名採点する ➔
+                  1分で匿名採点する &gt;
                 </div>
                 <div
                   style={{
+                    display: 'flex',
                     fontSize: '15px',
                     color: '#94a3b8',
                     fontWeight: 'bold',
@@ -332,13 +335,14 @@ export async function GET(
 
               <div
                 style={{
+                  display: 'flex',
                   marginTop: '20px',
                   fontSize: '15px',
                   color: '#ec4899',
                   fontWeight: 'bold',
                 }}
               >
-                🎁 回答すると、あなたと{session.host_nickname}さんの相性診断もすぐ見られます！
+                {`🎁 回答すると、あなたと${session.host_nickname}さんの相性診断もすぐ見られます！`}
               </div>
             </div>
           </div>
