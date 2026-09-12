@@ -108,89 +108,89 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
-  const { sessionId } = await params;
-  const session = await getSession(sessionId);
+  try {
+    const { sessionId } = await params;
+    const session = await getSession(sessionId);
 
-  if (!session) {
-    return new Response('Not found', { status: 404 });
-  }
+    if (!session) {
+      return new Response('Not found', { status: 404 });
+    }
 
-  const peerAnswers = await getPeerAnswers(sessionId);
-  const answerCount = peerAnswers.length;
+    const peerAnswers = await getPeerAnswers(sessionId);
+    const answerCount = peerAnswers.length;
 
-  const width = 1200;
-  const height = 630;
+    const width = 1200;
+    const height = 630;
+    const origin = request.nextUrl.origin || 'https://gap-five-nine.vercel.app';
 
-  // 0人の場合（自認イラスト入りの招待・回答リクエスト用カード）
-  if (answerCount === 0) {
-    const selfInfo = SELF_IMAGE_MAP[session.self_label] || SELF_IMAGE_MAP['変幻自在のバランサー'];
-    const selfImgBase64 = getSelfImageBase64(session.self_label);
+    // 0人の場合（自認イラスト入りの招待・回答リクエスト用カード）
+    if (answerCount === 0) {
+      const selfInfo = SELF_IMAGE_MAP[session.self_label] || SELF_IMAGE_MAP['変幻自在のバランサー'];
+      const imgUrl = `${origin}/gap-samples/${selfInfo.file}`;
 
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
-            color: 'white',
-            padding: '50px 60px',
-            fontFamily: 'sans-serif',
-          }}
-        >
-          {/* 左：自認イラストカード */}
+      return new ImageResponse(
+        (
           <div
             style={{
-              width: '430px',
-              height: '520px',
+              width: '100%',
+              height: '100%',
               display: 'flex',
-              flexDirection: 'column',
-              background: '#1e293b',
-              borderRadius: '28px',
-              border: '3px solid rgba(251, 191, 36, 0.6)',
-              overflow: 'hidden',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-              position: 'relative',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#0f172a',
+              color: 'white',
+              padding: '50px 60px',
+              fontFamily: 'sans-serif',
             }}
           >
-            {/* ヘッダーバッジ */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '12px 20px',
-                background: 'rgba(245, 158, 11, 0.2)',
-                borderBottom: '1px solid rgba(245, 158, 11, 0.4)',
-              }}
-            >
-              <span style={{ fontSize: '15px', fontWeight: 900, color: '#fbbf24' }}>
-                本人の自認（MY VIEW）
-              </span>
-              <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#fef3c7', background: 'rgba(245, 158, 11, 0.3)', padding: '2px 10px', borderRadius: '12px' }}>
-                自称ラベル
-              </span>
-            </div>
-
-            {/* イラスト画像 */}
+            {/* 左：自認イラストカード */}
             <div
               style={{
                 width: '430px',
-                height: '350px',
+                height: '520px',
                 display: 'flex',
-                position: 'relative',
+                flexDirection: 'column',
+                backgroundColor: '#1e293b',
+                borderRadius: '24px',
+                border: '3px solid #fbbf24',
                 overflow: 'hidden',
-                background: '#020617',
+                position: 'relative',
               }}
             >
-              {selfImgBase64 ? (
-                // eslint-disable-next-line @next/next/no-img-element
+              {/* ヘッダーバッジ */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 20px',
+                  backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                  borderBottom: '1px solid rgba(245, 158, 11, 0.4)',
+                }}
+              >
+                <span style={{ fontSize: '15px', fontWeight: 900, color: '#fbbf24' }}>
+                  本人の自認（MY VIEW）
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#fef3c7', backgroundColor: 'rgba(245, 158, 11, 0.3)', padding: '2px 10px', borderRadius: '12px' }}>
+                  自称ラベル
+                </span>
+              </div>
+
+              {/* イラスト画像 */}
+              <div
+                style={{
+                  width: '430px',
+                  height: '350px',
+                  display: 'flex',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  backgroundColor: '#020617',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={selfImgBase64}
+                  src={imgUrl}
                   alt={session.self_label}
                   style={{
                     width: '100%',
@@ -198,159 +198,152 @@ export async function GET(
                     objectFit: 'cover',
                   }}
                 />
-              ) : (
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>
-                  🎭
+                {/* ふきだし */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    backgroundColor: '#ffffff',
+                    color: '#0f172a',
+                    padding: '8px 16px',
+                    borderRadius: '16px',
+                    fontSize: '14px',
+                    fontWeight: 900,
+                    border: '2px solid #fbbf24',
+                    maxWidth: '300px',
+                    display: 'flex',
+                  }}
+                >
+                  {selfInfo.bubble}
                 </div>
-              )}
-              {/* ふきだし */}
+              </div>
+
+              {/* フッター解説 */}
               <div
                 style={{
-                  position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  background: '#ffffff',
-                  color: '#0f172a',
-                  padding: '8px 16px',
-                  borderRadius: '16px',
-                  borderTopRightRadius: '0px',
-                  fontSize: '14px',
-                  fontWeight: 900,
-                  boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-                  border: '2px solid #fbbf24',
-                  maxWidth: '300px',
+                  padding: '12px 20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  flex: 1,
+                  backgroundColor: '#0f172a',
                 }}
               >
-                {selfInfo.bubble}
+                <div style={{ fontSize: '19px', fontWeight: 900, color: '#fbbf24', marginBottom: '3px' }}>
+                  「{session.self_label}」
+                </div>
+                <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.3 }}>
+                  {selfInfo.desc}
+                </div>
               </div>
             </div>
 
-            {/* フッター解説 */}
+            {/* 右：メッセージ ＆ 回答リクエスト */}
             <div
               style={{
-                padding: '12px 20px',
+                width: '610px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                flex: 1,
-                background: '#0f172a',
-              }}
-            >
-              <div style={{ fontSize: '19px', fontWeight: 900, color: '#fbbf24', marginBottom: '3px' }}>
-                「{session.self_label}」
-              </div>
-              <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.3 }}>
-                {selfInfo.desc}
-              </div>
-            </div>
-          </div>
-
-          {/* 右：メッセージ ＆ 回答リクエスト */}
-          <div
-            style={{
-              width: '610px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              paddingLeft: '36px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: 'rgba(59, 130, 246, 0.2)',
-                border: '1px solid rgba(59, 130, 246, 0.4)',
-                borderRadius: '9999px',
-                padding: '6px 20px',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                color: '#60a5fa',
-                marginBottom: '20px',
-                alignSelf: 'flex-start',
-              }}
-            >
-              ✨ GAP-FIVE 性格ギャップ診断
-            </div>
-
-            <div
-              style={{
-                fontSize: '42px',
-                fontWeight: 900,
-                color: '#ffffff',
-                lineHeight: 1.25,
-                marginBottom: '16px',
-              }}
-            >
-              {session.host_nickname} さんの性格を教えてください！
-            </div>
-
-            <div
-              style={{
-                fontSize: '20px',
-                color: '#94a3b8',
-                lineHeight: 1.5,
-                marginBottom: '28px',
-              }}
-            >
-              本人は<span style={{ color: '#fbbf24', fontWeight: 'bold' }}>「{session.self_label}」</span>だと思い込んでいますが、あなたから見たら本当はどう見えていますか…？
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
+                paddingLeft: '36px',
               }}
             >
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  background: 'linear-gradient(90deg, #2563eb 0%, #4f46e5 100%)',
-                  borderRadius: '16px',
-                  padding: '16px 36px',
-                  fontSize: '22px',
-                  fontWeight: 900,
-                  color: 'white',
-                  boxShadow: '0 10px 25px rgba(37, 99, 235, 0.5)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                  border: '1px solid rgba(59, 130, 246, 0.4)',
+                  borderRadius: '9999px',
+                  padding: '6px 20px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  color: '#60a5fa',
+                  marginBottom: '20px',
+                  alignSelf: 'flex-start',
                 }}
               >
-                1分で匿名採点する ➔
+                ✨ GAP-FIVE 性格ギャップ診断
               </div>
+
               <div
                 style={{
-                  fontSize: '15px',
+                  fontSize: '42px',
+                  fontWeight: 900,
+                  color: '#ffffff',
+                  lineHeight: 1.25,
+                  marginBottom: '16px',
+                }}
+              >
+                {session.host_nickname} さんの性格を教えてください！
+              </div>
+
+              <div
+                style={{
+                  fontSize: '20px',
                   color: '#94a3b8',
+                  lineHeight: 1.5,
+                  marginBottom: '28px',
+                }}
+              >
+                本人は<span style={{ color: '#fbbf24', fontWeight: 'bold' }}>「{session.self_label}」</span>だと思い込んでいますが、あなたから見たら本当はどう見えていますか…？
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    backgroundColor: '#2563eb',
+                    borderRadius: '16px',
+                    padding: '16px 36px',
+                    fontSize: '22px',
+                    fontWeight: 900,
+                    color: 'white',
+                  }}
+                >
+                  1分で匿名採点する ➔
+                </div>
+                <div
+                  style={{
+                    fontSize: '15px',
+                    color: '#94a3b8',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  ※登録不要・完全匿名
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: '20px',
+                  fontSize: '15px',
+                  color: '#ec4899',
                   fontWeight: 'bold',
                 }}
               >
-                ※登録不要・完全匿名
+                🎁 回答すると、あなたと{session.host_nickname}さんの相性診断もすぐ見られます！
               </div>
             </div>
-
-            <div
-              style={{
-                marginTop: '20px',
-                fontSize: '15px',
-                color: '#ec4899',
-                fontWeight: 'bold',
-              }}
-            >
-              🎁 回答すると、あなたと{session.host_nickname}さんの相性診断もすぐ見られます！
-            </div>
           </div>
-        </div>
-      ),
-      {
-        width,
-        height,
-        headers: {
-          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
-        },
-      }
-    );
-  }
+        ),
+        {
+          width,
+          height,
+          headers: {
+            'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+          },
+        }
+      );
+    }
 
   // 1人以上の場合（結果カード）
   const peerScoresArray = peerAnswers.map((a) => a.peer_scores);
@@ -606,4 +599,8 @@ export async function GET(
       },
     }
   );
+  } catch (err: any) {
+    console.error('OG Image Generation Error:', err);
+    return new Response(err?.message || 'Internal Server Error', { status: 500 });
+  }
 }
