@@ -1,14 +1,37 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { getSession } from '@/lib/actions/session';
-import { getPeerAnswers } from '@/lib/actions/peer';
+import { createClient } from '@/lib/supabase/client';
+import { memoryDb } from '@/lib/store/memoryStore';
 import { calculateAveragePeerScores } from '@/lib/core/tipi';
 import { generateFinalResult } from '@/lib/core/gap';
-import { TraitKey, TraitScores } from '@/lib/core/types';
+import { TraitKey, TraitScores, SessionData } from '@/lib/core/types';
 
 export const runtime = 'nodejs';
+
+async function fetchSessionData(sessionId: string): Promise<SessionData | null> {
+  const supabase = createClient();
+  if (supabase) {
+    const { data } = await supabase
+      .from('sessions')
+      .select('id, host_nickname, self_scores, self_label, created_at')
+      .eq('id', sessionId)
+      .single();
+    if (data) return data as SessionData;
+  }
+  return (memoryDb.sessions.get(sessionId) as SessionData) || null;
+}
+
+async function fetchPeerAnswersData(sessionId: string) {
+  const supabase = createClient();
+  if (supabase) {
+    const { data } = await supabase
+      .from('peer_answers')
+      .select('peer_scores')
+      .eq('session_id', sessionId);
+    if (data) return data;
+  }
+  return memoryDb.peerAnswers.get(sessionId) || [];
+}
 
 const SELF_IMAGE_MAP: Record<string, { file: string; desc: string; bubble: string }> = {
   '情熱のインフルエンサー': {
@@ -68,21 +91,6 @@ const SELF_IMAGE_MAP: Record<string, { file: string; desc: string; bubble: strin
   },
 };
 
-function getSelfImageBase64(selfLabel: string): string | null {
-  try {
-    const info = SELF_IMAGE_MAP[selfLabel] || SELF_IMAGE_MAP['変幻自在のバランサー'];
-    if (!info) return null;
-    const filePath = path.join(process.cwd(), 'public', 'gap-samples', info.file);
-    if (fs.existsSync(filePath)) {
-      const buffer = fs.readFileSync(filePath);
-      return `data:image/jpeg;base64,${buffer.toString('base64')}`;
-    }
-  } catch (err) {
-    console.warn('Failed to load self image for OG:', err);
-  }
-  return null;
-}
-
 const TRAITS: TraitKey[] = ['E', 'A', 'C', 'S', 'O'];
 const TRAIT_NAMES: Record<TraitKey, string> = {
   E: '外向性',
@@ -110,13 +118,13 @@ export async function GET(
 ) {
   try {
     const { sessionId } = await params;
-    const session = await getSession(sessionId);
+    const session = await fetchSessionData(sessionId);
 
     if (!session) {
       return new Response('Not found', { status: 404 });
     }
 
-    const peerAnswers = await getPeerAnswers(sessionId);
+    const peerAnswers = await fetchPeerAnswersData(sessionId);
     const answerCount = peerAnswers.length;
 
     const width = 1200;
