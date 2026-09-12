@@ -41,7 +41,8 @@ export async function POST(req: NextRequest) {
     const unitAmount = isPair ? 100 : 300; // 個別相性は100円、全体レポートは300円
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      // payment_method_typesを省略することでStripeの動的決済手段（Dynamic Payment Methods）が有効になり、
+      // 端末やブラウザに応じて Apple Pay, Google Pay, PayPay, Link, クレジットカードが自動表示されます
       line_items: [
         {
           price_data: {
@@ -56,6 +57,11 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'payment',
+      submit_type: 'pay',
+      billing_address_collection: 'auto',
+      phone_number_collection: {
+        enabled: false,
+      },
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
