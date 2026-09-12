@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, Share2 } from 'lucide-react';
+import { Copy, Check, Share2, Download, Loader2 } from 'lucide-react';
 
 interface ShareButtonsProps {
   shareUrl: string;
   hostNickname: string;
   isResult?: boolean;
   resultTitle?: string;
+  sessionId?: string;
 }
 
 export const ShareButtons: React.FC<ShareButtonsProps> = ({
@@ -15,8 +16,48 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
   hostNickname,
   isResult = false,
   resultTitle,
+  sessionId,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [isSavingImage, setIsSavingImage] = useState(false);
+
+  const handleSaveImage = async () => {
+    if (!sessionId) return;
+    setIsSavingImage(true);
+    try {
+      const ogUrl = `/api/og/${sessionId}?v=${Date.now()}`;
+      const res = await fetch(ogUrl);
+      if (!res.ok) throw new Error('画像の生成に失敗しました');
+      const blob = await res.blob();
+      const fileName = `gap-five-${hostNickname}.png`;
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      // iOS Safari / Android Chrome での写真保存・共有シート
+      if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `${hostNickname}さんの性格ギャップ診断結果`,
+          text: `私の診断結果は【${resultTitle || ''}】でした！ #GAPFIVE`,
+        });
+      } else {
+        // PC・非対応ブラウザでのダウンロード
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
+      }
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        alert('画像の保存に失敗しました。もう一度お試しいただくか、画面のスクリーンショットをご利用ください。');
+      }
+    } finally {
+      setIsSavingImage(false);
+    }
+  };
 
   const handleCopy = async () => {
     try {
@@ -94,6 +135,27 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
           <span>Xでシェア</span>
         </a>
       </div>
+
+      {isResult && sessionId && (
+        <button
+          type="button"
+          onClick={handleSaveImage}
+          disabled={isSavingImage}
+          className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-bold text-sm shadow-md shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-75 cursor-pointer"
+        >
+          {isSavingImage ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>カード画像を作成中...</span>
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4" />
+              <span>結果画像を保存（写真アプリ / 端末へ保存）</span>
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 };

@@ -159,9 +159,16 @@ export default async function ResultPage({ params }: ResultPageProps) {
           <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="space-y-1">
-            <span className="text-xs font-bold text-indigo-300 tracking-wider uppercase">
-              {session.host_nickname} さんの確定二つ名
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-indigo-300 tracking-wider uppercase">
+                {session.host_nickname} さんの確定二つ名
+              </span>
+              {finalResult.isRare && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-400 via-rose-400 to-purple-400 text-slate-900 shadow-sm animate-pulse">
+                  ✨ {finalResult.rarityBadge}
+                </span>
+              )}
+            </div>
             <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 leading-tight">
               {finalResult.title}
             </h1>
@@ -261,6 +268,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
             hostNickname={session.host_nickname}
             isResult={true}
             resultTitle={finalResult.title}
+            sessionId={sessionId}
           />
         </div>
 

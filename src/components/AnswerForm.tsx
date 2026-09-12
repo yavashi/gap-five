@@ -51,7 +51,9 @@ export const AnswerForm: React.FC<AnswerFormProps> = ({ session }) => {
       try {
         const res = await submitPeerAnswer(sessionId, nickname, answersArray, comment);
         if (res.success) {
-          router.push(`/answer/${sessionId}/thanks?host=${encodeURIComponent(hostName)}`);
+          router.push(
+            `/answer/${sessionId}/thanks?host=${encodeURIComponent(hostName)}&aid=${res.answerId}`
+          );
         }
       } catch (err: any) {
         setError(err.message || '回答の送信に失敗しました。もう一度お試しください。');
