@@ -74,6 +74,30 @@ export default function StylePreviewPage() {
         desc: '暴かれた実態：雨の中、捨て猫に傘を差し出し、泣いてる後輩にアツアツの肉まんと温かい缶コーヒーを渡しつつ、顔だけは頑なに「フン！」とそっぽを向いている。',
       },
     },
+    {
+      id: 'acrobat',
+      title: '④ 崖っぷちの神業アクロバット（C_under）',
+      hostName: 'ショウタさん',
+      self: {
+        label: '型破りなインプロバイザー',
+        img: '/gap-samples/acrobat_clean_self.jpg',
+        bubble: '「計画なんて縛られたくない。\n直感とアドリブが俺の流儀🎸」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-amber-400',
+        thought: '「自分はいつも行き当たりばったりの自由人」',
+        desc: '本人の自認：ギターとデザインスケッチに囲まれてペンを回し、気ままなアドリブで生きる自由人。',
+      },
+      gap: {
+        label: '崖っぷちの神業アクロバット',
+        img: '/gap-samples/acrobat_clean_gap.jpg',
+        bubble: '「奇跡の神プレゼンだ…！\n全米が泣いた完璧な仕事…！😭👏」',
+        bubblePos: 'bottom-16 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-yellow-200 border-yellow-500',
+        subBubble: '「えっ…通っちゃった…？（白目）」',
+        witness: '周囲の証言：「本人の体感はいつも泥縄だが、土壇場の帳尻合わせが完璧すぎて周囲からは超有能に見えている」',
+        desc: '暴かれた実態：本人は締め切り23:59:59に命からがら提出して煙を吹きながら呆然としているが、スクリーンには金賞の完璧な仕事が表示され、役員たちが感涙のスタンディングオベーション。',
+      },
+    },
   ];
 
   return (
