@@ -139,6 +139,7 @@ export function generateFinalResult(self: TraitScores, peer: TraitScores): Final
   if (deltas[0].absDelta < 1.0) {
     return {
       title: `「${selfLabel}」そのままの等身大パーソン`,
+      peerRealityTitle: 'ありのままの等身大パーソン',
       description: '自分に対する認識と、周囲から見えている姿がほぼ完全に一致しています。偽りなく自然体で生きられている稀有な状態です。',
       selfLabel,
       isConcordant: true,
@@ -163,6 +164,7 @@ export function generateFinalResult(self: TraitScores, peer: TraitScores): Final
 
   // タイトル構築とレア称号判定
   let title = '';
+  let peerRealityTitle = '';
   let description = '';
   let isRare = false;
   let rarityBadge: string | undefined = undefined;
@@ -174,6 +176,7 @@ export function generateFinalResult(self: TraitScores, peer: TraitScores): Final
   if (highTraitsSelf.length >= 3 || highTraitsPeer.length >= 3) {
     isRare = true;
     rarityBadge = 'SSS級レア';
+    peerRealityTitle = '全方位無敵のハッピーオーラ・エンターテイナー';
     title = '【SSS級レア】全方位無敵のハッピーオーラ・エンターテイナー';
     description =
       '常人の枠に収まらない圧倒的バイタリティの持ち主。行く先々で空気を支配し、周囲を前向きに巻き込んで前進する天性のカリスマです。';
@@ -183,42 +186,52 @@ export function generateFinalResult(self: TraitScores, peer: TraitScores): Final
     rarityBadge = 'URレア';
     const top = deltas[0];
     if (top.trait === 'E' && top.delta < 0) {
+      peerRealityTitle = 'ステルス国家機密級インフルエンサー';
       title = '【URレア】自称・陰キャを偽る「ステルス国家機密級インフルエンサー」';
       description =
         '本人は部屋の隅でじっとしていたいと本気で信じていますが、周囲から見ると存在自体が台風の目。天性の人たらしオーラが全開で漏れ出しています。';
     } else if (top.trait === 'E' && top.delta > 0) {
+      peerRealityTitle = '脳内超新星爆発「沈黙の孤高哲学者」';
       title = '【URレア】脳内超新星爆発「沈黙の孤高哲学者」';
       description =
         '頭の中では全員とハイタッチしているつもりですが、外見は静寂を極めすぎて周囲からミステリアスな賢者として崇められています。';
     } else if (top.trait === 'A' && top.delta < 0) {
+      peerRealityTitle = '無自覚聖母「ツンデレ救済アンカー」';
       title = '【URレア】無自覚聖母「ツンデレ救済アンカー」';
       description =
         '「別にアンタのためじゃない」と嘯きながら、全員の面倒を完璧に見てしまう隠れマザーテレサです。';
     } else if (top.trait === 'A' && top.delta > 0) {
+      peerRealityTitle = '笑顔の奥に刃を隠す「冷徹なる敏腕軍師」';
       title = '【URレア】笑顔の奥に刃を隠す「冷徹なる敏腕軍師」';
       description =
         '本人は気遣いMAXのつもりですが、放つ一言が核心を突きすぎて周囲からは切れ者として畏怖されています。';
     } else if (top.trait === 'C' && top.delta < 0) {
+      peerRealityTitle = '土壇場の大逆転劇「崖っぷちの奇跡召喚士」';
       title = '【URレア】土壇場の大逆転劇「崖っぷちの奇跡召喚士」';
       description =
         '本人はいつも泥縄で焦っていますが、土壇場の帳尻合わせが完璧すぎて周囲からは超有能な仕事人に見えています。';
     } else if (top.trait === 'C' && top.delta > 0) {
+      peerRealityTitle = '空前絶後の「白紙の超完璧主義者」';
       title = '【URレア】空前絶後の「白紙の超完璧主義者」';
       description =
         '頭の中には壮大な設計図があるものの、自由奔放に振る舞いすぎて周囲からは野生のアーティスト枠で見られています。';
     } else if (top.trait === 'S' && top.delta < 0) {
+      peerRealityTitle = '水面の白鳥「絶対防壁のアイアンポーカーフェイス」';
       title = '【URレア】水面の白鳥「絶対防壁のアイアンポーカーフェイス」';
       description =
         '内心はジェットコースターのように焦っているのに、表情が1ミリも動かないため周囲からは何があっても動じない大物と信じ切られています。';
     } else if (top.trait === 'S' && top.delta > 0) {
+      peerRealityTitle = 'ガラスの甲冑を纏った「超敏感バロメーター」';
       title = '【URレア】ガラスの甲冑を纏った「超敏感バロメーター」';
       description =
         '「全然平気！」と笑顔で強がっていますが、周囲は微細な動揺を察知して全力で守ってあげたくなっています。';
     } else if (top.trait === 'O' && top.delta < 0) {
+      peerRealityTitle = '常識人のフリをした「天然記念物級異次元イノベーター」';
       title = '【URレア】常識人のフリをした「天然記念物級異次元イノベーター」';
       description =
         '本人は極めて平凡に生きているつもりですが、繰り出す発想とセンスが異次元すぎて周囲からは宇宙人枠として愛されています。';
     } else {
+      peerRealityTitle = '秘密基地の「空想科学マッドサイエンティスト」';
       title = '【URレア】秘密基地の「空想科学マッドサイエンティスト」';
       description =
         '脳内は銀河系レベルの妄想とアイデアで溢れ返っているのに、普段は真面目な社会人の仮面を完璧に被っています。';
@@ -230,16 +243,20 @@ export function generateFinalResult(self: TraitScores, peer: TraitScores): Final
     // 3. アドリブの神業型（SSRレア）
     isRare = true;
     rarityBadge = 'SSRレア';
+    peerRealityTitle = '計画性ゼロから勝つ「アドリブの神業イノベーター」';
     title = '【SSRレア】計画性ゼロから勝つ「アドリブの神業イノベーター」';
     description =
       'スケジュール帳は真っ白ですが、土壇場のアドリブと天才的なひらめきだけであらゆる困難をクリアしていく愛され主人公です。';
   } else {
     // 通常の称号構築
     if (primaryPart && secondaryPart) {
+      peerRealityTitle = `「${secondaryPart.name}」を宿した「${primaryPart.name}」`;
       title = `自称・${selfLabel}、実態は「${secondaryPart.name}」を宿した「${primaryPart.name}」`;
     } else if (primaryPart) {
+      peerRealityTitle = `「${primaryPart.name}」`;
       title = `「${selfLabel}」の皮を被った「${primaryPart.name}」`;
     } else {
+      peerRealityTitle = `「${selfLabel}」の探求者`;
       title = `「${selfLabel}」の探求者`;
     }
 
@@ -254,6 +271,7 @@ export function generateFinalResult(self: TraitScores, peer: TraitScores): Final
 
   return {
     title,
+    peerRealityTitle,
     description,
     selfLabel,
     isConcordant: false,

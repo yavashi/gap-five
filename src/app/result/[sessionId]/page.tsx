@@ -204,19 +204,20 @@ export default async function ResultPage({ params }: ResultPageProps) {
                 finalTitle={finalResult.title}
                 selfLabel={finalResult.selfLabel}
                 peerRealityLabel={finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
+                peerRealityTitle={finalResult.peerRealityTitle}
                 isRare={finalResult.isRare}
                 rarityBadge={finalResult.rarityBadge}
                 answerCount={answerCount}
               />
 
-              {/* 確定称号メインカード */}
-              <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-4 relative overflow-hidden">
+              {/* 確定称号メインカード（自称と実態の2段構成） */}
+              <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-indigo-300 tracking-wider uppercase">
-                      {session.host_nickname} さんの確定二つ名
+                      {session.host_nickname} さんの確定診断
                     </span>
                     {finalResult.isRare && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-400 via-rose-400 to-purple-400 text-slate-900 shadow-sm animate-pulse">
@@ -224,21 +225,30 @@ export default async function ResultPage({ params }: ResultPageProps) {
                       </span>
                     )}
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 leading-tight">
-                    {finalResult.title}
-                  </h1>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
-                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                    <span className="text-slate-400 block font-bold">本人の自認</span>
-                    <span className="font-extrabold text-blue-300">{finalResult.selfLabel}</span>
-                  </div>
-                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                    <span className="text-slate-400 block font-bold">周囲から見た実態</span>
-                    <span className="font-extrabold text-rose-300">
-                      {finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
-                    </span>
+                  {/* 自称と実態の2段構成 */}
+                  <div className="space-y-3">
+                    {/* 1段目: 本人の自称 */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-sm">
+                      <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 font-bold border border-blue-400/30 whitespace-nowrap">
+                        自称
+                      </span>
+                      <span className="font-extrabold text-slate-200 truncate">
+                        {finalResult.selfLabel}
+                      </span>
+                    </div>
+
+                    {/* 2段目: 周囲が暴いた実態（確定二つ名） */}
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-bold border border-rose-400/30 text-xs sm:text-sm whitespace-nowrap">
+                          実態（確定二つ名）
+                        </span>
+                      </div>
+                      <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 leading-tight pt-1 drop-shadow-sm">
+                        {finalResult.peerRealityTitle || finalResult.title}
+                      </h1>
+                    </div>
                   </div>
                 </div>
               </div>

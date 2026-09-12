@@ -46,6 +46,7 @@ export interface FinalResult {
   title: string;
   description: string;
   selfLabel: string;
+  peerRealityTitle: string; // 実態の二つ名（例: 「水面の白鳥」を宿した「秘密基地の空想科学者」）
   isConcordant: boolean; // 等身大かどうか（自己と他者の乖離が小さい）
   primaryGap: GapPart | null;
   secondaryGap: GapPart | null;
