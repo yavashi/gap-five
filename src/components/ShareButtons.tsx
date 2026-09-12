@@ -70,15 +70,24 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
     }
   };
 
+  // 相手別ニックネーム使い分けステート
+  const [customAlias, setCustomAlias] = useState('');
+  const [showAliasInput, setShowAliasInput] = useState(false);
+
+  const effectiveName = customAlias.trim() || hostNickname;
+  const currentShareUrl = customAlias.trim()
+    ? `${shareUrl}${shareUrl.includes('?') ? '&' : '?'}as=${encodeURIComponent(customAlias.trim())}`
+    : shareUrl;
+
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(currentShareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
       // フォールバック
       const textarea = document.createElement('textarea');
-      textarea.value = shareUrl;
+      textarea.value = currentShareUrl;
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand('copy');
@@ -89,9 +98,9 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
   };
 
   // メッセージの作成
-  const inviteText = `${hostNickname}さんの性格診断に協力してください！\nあなたの目から見た${hostNickname}さんはどんな人？（所要時間1分・完全匿名）\n${shareUrl}`;
+  const inviteText = `${effectiveName}さんの性格診断に協力してください！\nあなたの目から見た${effectiveName}さんはどんな人？（所要時間1分・完全匿名）\n${currentShareUrl}`;
   const resultText = isResult
-    ? `【自称と実態のギャップ診断】\n私の診断結果は「${resultTitle || ''}」でした！\nみんなの目から見た私はどう見えてる？\n${shareUrl} #GAPFIVE`
+    ? `【自称と実態のギャップ診断】\n私の診断結果は「${resultTitle || ''}」でした！\nみんなの目から見た私はどう見えてる？\n${currentShareUrl} #GAPFIVE`
     : inviteText;
 
   // LINE共有URL
@@ -102,11 +111,74 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
 
   return (
     <div className="space-y-3">
+      {/* ニックネーム使い分け（エイリアス）切り替えボタン＆パネル */}
+      {!isResult && (
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <span>相手に見せる表示名：</span>
+              <strong className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                {effectiveName}
+              </strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowAliasInput(!showAliasInput)}
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+            >
+              {showAliasInput ? '閉じる' : '相手ごとに名前を変える'}
+            </button>
+          </div>
+
+          {showAliasInput && (
+            <div className="pt-2 border-t border-slate-200 space-y-2 animate-fadeIn">
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                職場の上司、学生時代の友人、SNSなど、<strong>送る相手によって呼ばれ方を変えたい場合</strong>はここで設定できます（あなたの管理名自体は非公開のまま保持されます）。
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  maxLength={15}
+                  value={customAlias}
+                  onChange={(e) => setCustomAlias(e.target.value)}
+                  placeholder={`例: ${hostNickname}くん、山田、たっちゃん`}
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {customAlias && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomAlias('')}
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-600 text-xs font-bold transition-colors"
+                  >
+                    リセット
+                  </button>
+                )}
+              </div>
+
+              {/* クイックサジェスト */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[10px] text-slate-400 font-bold">サジェスト例:</span>
+                {[`${hostNickname}さん`, `${hostNickname}くん`, `${hostNickname}先輩`, `${hostNickname}ちゃん`].map((sug) => (
+                  <button
+                    key={sug}
+                    type="button"
+                    onClick={() => setCustomAlias(sug)}
+                    className="text-[10px] font-semibold text-slate-600 bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-600 px-2 py-0.5 rounded-md transition-colors"
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center gap-2 bg-slate-100 p-2 rounded-xl border border-slate-200">
         <input
           type="text"
           readOnly
-          value={shareUrl}
+          value={currentShareUrl}
           className="bg-transparent flex-1 text-xs text-slate-600 px-2 outline-none font-mono select-all truncate"
         />
         <button
