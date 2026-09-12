@@ -10,11 +10,12 @@ import { User, MessageSquare, Loader2, HeartHandshake } from 'lucide-react';
 
 interface AnswerFormProps {
   session: SessionData;
+  customHostName?: string;
 }
 
-export const AnswerForm: React.FC<AnswerFormProps> = ({ session }) => {
+export const AnswerForm: React.FC<AnswerFormProps> = ({ session, customHostName }) => {
   const router = useRouter();
-  const hostName = session.host_nickname;
+  const hostName = customHostName?.trim() || session.host_nickname;
   const sessionId = session.id;
 
   const [nickname, setNickname] = useState('');

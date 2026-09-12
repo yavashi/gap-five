@@ -98,25 +98,26 @@ function ThanksContent() {
           </div>
         ) : null}
 
-        {/* お返し診断プロモーションカード（バイラル導線） */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white text-left space-y-3 shadow-md">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/30 text-indigo-300 text-xs font-bold border border-indigo-400/30">
+        {/* お返し相互診断プロモーションカード（バイラル導線） */}
+        <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white text-left space-y-3 shadow-lg border border-indigo-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/30 text-indigo-300 text-xs font-bold border border-indigo-400/30">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>お返し診断（次はあなたの番！）</span>
+            <span>完全相互診断ループ（次はあなたの番！）</span>
           </div>
 
-          <h3 className="text-base font-black text-slate-100">
-            {hostName} さんから見たあなたは、一体どう見えている？
+          <h3 className="text-base sm:text-lg font-black text-slate-100 leading-snug">
+            {peerName} さんの番です！<br />
+            {hostName} さんから見たあなたは、どう映っている？
           </h3>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            あなたも1分で自己診断を作成してURLを送れば、{hostName} さんにあなたの「自称と実態のギャップ」を採点してもらえます！
+          <p className="text-xs text-indigo-100/80 leading-relaxed">
+            あなたも1分で自己診断を作ると、{hostName} さんにあなたを逆評価（私→鈴木さん）してもらう専用リンクが発行されます。お互いの評価が揃うと、2人の絆やギャップの全容が明らかになります！
           </p>
 
           <Link
-            href="/diagnose"
-            className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-md shadow-blue-500/30 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            href={`/diagnose?fromSession=${sessionId}&name=${encodeURIComponent(peerName === 'あなた' ? '' : peerName)}&returnToHost=${encodeURIComponent(hostName)}`}
+            className="inline-flex items-center justify-center gap-2 w-full py-4 px-4 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm sm:text-base font-black shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.01] active:scale-[0.99]"
           >
-            <span>自分のギャップ診断をつくる（無料・1分）</span>
+            <span>{peerName !== 'あなた' ? `${peerName}さんの` : '自分の'}診断を作って{hostName}さんに逆評価してもらう</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
