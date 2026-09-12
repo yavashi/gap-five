@@ -98,162 +98,158 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
-          1対1 相性診断
+        <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+          PAIR REPORT
         </span>
       </div>
 
-      {/* 回答者選択タブ（複数人の場合） */}
+      {/* 回答者タブ切り替え */}
       {compatibilities.length > 1 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
-          {compatibilities.map((comp, idx) => {
-            const isTabUnlocked = !!unlockedMap[comp.peerNickname];
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setSelectedIndex(idx)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                  selectedIndex === idx
-                    ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/20'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <span>{comp.peerNickname} さんとの相性</span>
-                {isTabUnlocked ? (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                ) : (
-                  <Lock className="w-3 h-3 opacity-60" />
-                )}
-              </button>
-            );
-          })}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {compatibilities.map((c, idx) => (
+            <button
+              key={c.peerNickname}
+              onClick={() => setSelectedIndex(idx)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                selectedIndex === idx
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <span>{c.peerNickname} さん</span>
+              {unlockedMap[c.peerNickname] ? (
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              ) : (
+                <span className="text-[10px] opacity-70">無料版</span>
+              )}
+            </button>
+          ))}
         </div>
       )}
 
-      {/* 【無料公開枠】相性度スコア & 二つ名・キャッチコピー */}
-      <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-500/10 via-pink-500/5 to-amber-500/10 border border-rose-200/60 space-y-3">
+      {/* 相性サマリー（常に無料公開） */}
+      <div className="bg-gradient-to-br from-rose-50 via-purple-50 to-indigo-50 border border-rose-100/80 rounded-2xl p-5 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-rose-700">
-            {hostNickname} × {current.peerNickname} の波長シンクロ度
+          <span className="text-xs font-bold text-rose-700 flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5" />
+            {hostNickname} × {current.peerNickname}
           </span>
-          <span className="text-2xl font-black text-rose-600">
-            {current.score}%
-          </span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-xs text-slate-500 font-medium">波長シンクロ度</span>
+            <span className="text-2xl font-black text-rose-600">
+              {current.score}%
+            </span>
+          </div>
         </div>
 
-        <div className="space-y-1">
-          <div className="text-base sm:text-lg font-black text-slate-900 leading-snug">
-            {current.title}
+        <div>
+          <span className="text-[10px] font-bold text-slate-400 block mb-0.5">2人の関係性タイプ</span>
+          <div className="text-sm font-black text-slate-800">
+            『{current.pairTitle}』
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            {current.tagline}
-          </p>
         </div>
+
+        <p className="text-xs text-slate-600 leading-relaxed">
+          {current.dynamicSummary}
+        </p>
       </div>
 
-      {/* 【有料・詳細分析コンテンツ（1人100円）】 */}
+      {/* 有料アンロック済みコンテンツ */}
       {isCurrentUnlocked ? (
-        <div className="space-y-4 text-xs animate-in fade-in duration-300">
-          <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px] pb-1 border-b border-slate-100">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{current.peerNickname} さんとの詳細相性カルテ（開放済み）</span>
+        <div className="space-y-4 pt-2 border-t border-slate-100 animate-in fade-in duration-300">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              個別カルテ開放済み
+            </span>
+            <span className="text-[10px] text-slate-400">100円買い切り</span>
           </div>
 
-          {/* 相手から見た最大の魅力 */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-blue-700">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{current.peerNickname} さんから見たあなたの魅力</span>
+          <div className="space-y-3 text-xs">
+            <div className="bg-amber-50/70 border border-amber-200/60 rounded-xl p-4">
+              <div className="flex items-center gap-1.5 font-bold text-amber-900 mb-1.5">
+                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>すれ違いやすい地雷・衝突の落とし穴</span>
+              </div>
+              <p className="text-amber-900/90 leading-relaxed pl-5">
+                {current.deepReport.potentialFriction}
+              </p>
             </div>
-            <p className="text-slate-700 leading-relaxed">
-              {current.peerImpression}
-            </p>
-          </div>
 
-          {/* 2人のシナジー */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-emerald-700">
-              <Lightbulb className="w-3.5 h-3.5" />
-              <span>2人が共鳴・高め合えるポイント</span>
+            <div className="bg-indigo-50/70 border border-indigo-200/60 rounded-xl p-4">
+              <div className="flex items-center gap-1.5 font-bold text-indigo-900 mb-1.5">
+                <MessageCircle className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span>本音を引き出すベストな会話トピック</span>
+              </div>
+              <p className="text-indigo-900/90 leading-relaxed pl-5">
+                {current.deepReport.bestConversation}
+              </p>
             </div>
-            <p className="text-slate-700 leading-relaxed">
-              {current.goodChemistry}
-            </p>
-          </div>
 
-          {/* すれ違いやすい地雷＆回避策 */}
-          <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-100 space-y-2">
-            <div className="flex items-center gap-1.5 font-bold text-rose-800">
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>すれ違いやすいポイント＆仲直りアドバイス</span>
+            <div className="bg-emerald-50/70 border border-emerald-200/60 rounded-xl p-4">
+              <div className="flex items-center gap-1.5 font-bold text-emerald-900 mb-1.5">
+                <Lightbulb className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>2人の関係がさらに深まるアクション</span>
+              </div>
+              <p className="text-emerald-900/90 leading-relaxed pl-5">
+                {current.deepReport.deepeningTip}
+              </p>
             </div>
-            <p className="text-slate-700 leading-relaxed">
-              <strong>注意点:</strong> {current.blindSpot}
-            </p>
-            <p className="text-slate-700 leading-relaxed">
-              <strong>解決策:</strong> {current.advice}
-            </p>
-          </div>
-
-          {/* 仲が深まる魔法の会話テーマ */}
-          <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-amber-800">
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>2人の仲が爆速で深まる「魔法の会話テーマ」</span>
-            </div>
-            <p className="text-slate-800 font-medium leading-relaxed">
-              「{current.magicTopic}」
-            </p>
           </div>
         </div>
       ) : (
-        /* 未購入時のチラ見せプレビュー（1人100円で個別購入） */
-        <div className="space-y-3 text-xs">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-slate-700">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>{current.peerNickname} さんから見たあなたの魅力</span>
+        /* 未開放ティーザー */
+        <div className="relative rounded-2xl border border-dashed border-rose-200 p-5 bg-gradient-to-b from-white to-rose-50/40 text-center space-y-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-bold">
+              <Lock className="w-3.5 h-3.5" />
+              {current.peerNickname} さんとの深層相性カルテ
             </div>
-            <p className="text-slate-500">
-              {current.peerImpression.slice(0, 24)}
-              <span className="blur-xs select-none opacity-60">...（詳細解説でアンロック）</span>
+            <p className="text-xs text-slate-600 max-w-sm mx-auto">
+              2人の「すれ違いやすい落とし穴」や「本音を引き出す対話法」など、関係を深める具体的なヒントをアンロックできます。
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-slate-700">
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              <span>すれ違いやすい地雷ポイント & 解決策</span>
+          <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-500 py-1">
+            <div className="p-2 bg-white/80 rounded-xl border border-rose-100 shadow-sm">
+              <span className="block font-bold text-slate-700 mb-0.5">⚠️ 衝突の地雷</span>
+              <span className="text-[10px] text-slate-400">喧嘩の予防策</span>
             </div>
-            <p className="text-slate-500">
-              {current.blindSpot.slice(0, 20)}
-              <span className="blur-xs select-none opacity-60">...（詳細解説でアンロック）</span>
-            </p>
+            <div className="p-2 bg-white/80 rounded-xl border border-rose-100 shadow-sm">
+              <span className="block font-bold text-slate-700 mb-0.5">💬 会話テーマ</span>
+              <span className="text-[10px] text-slate-400">本音の引き出し方</span>
+            </div>
+            <div className="p-2 bg-white/80 rounded-xl border border-rose-100 shadow-sm">
+              <span className="block font-bold text-slate-700 mb-0.5">💡 深める秘訣</span>
+              <span className="text-[10px] text-slate-400">長続きのコツ</span>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handlePairCheckout}
-            disabled={isLoading}
-            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-75"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>決済画面を準備中...</span>
-              </>
-            ) : (
-              <>
-                <Lock className="w-3.5 h-3.5 text-yellow-200" />
-                <span>{current.peerNickname} さんとの詳細解説を開放する（¥100）</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-              </>
-            )}
-          </button>
-          <p className="text-[10px] text-slate-400 text-center">
-            ※{current.peerNickname} さんとの1対1詳細カルテのみを100円で買い切り閲覧できます。
-          </p>
+          <div className="space-y-1.5 pt-1">
+            <button
+              onClick={handlePairCheckout}
+              disabled={isLoading}
+              className="w-full py-3 px-4 bg-gradient-to-r from-rose-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-xs sm:text-sm disabled:opacity-50 active:scale-[0.99]"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>決済ページへ移動中...</span>
+                </>
+              ) : (
+                <>
+                  <span>この人との相性カルテを見る（100円）</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+            <p className="text-[11px] font-bold text-rose-600">
+              ※追加請求なし・1回限りの買い切りです（月額課金・自動更新等は一切ありません）
+            </p>
+            <p className="text-[10px] text-slate-400">
+              ※{current.peerNickname} さんとの1対1詳細カルテのみを100円で買い切り閲覧できます。
+            </p>
+          </div>
         </div>
       )}
     </div>
