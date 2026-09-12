@@ -10,10 +10,15 @@ interface AnswerPageProps {
   params: Promise<{
     sessionId: string;
   }>;
+  searchParams: Promise<{
+    as?: string;
+    name?: string;
+  }>;
 }
 
-export async function generateMetadata({ params }: AnswerPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: AnswerPageProps): Promise<Metadata> {
   const { sessionId } = await params;
+  const { as, name } = await searchParams;
   const session = await getSession(sessionId);
 
   if (!session) {
@@ -22,8 +27,9 @@ export async function generateMetadata({ params }: AnswerPageProps): Promise<Met
     };
   }
 
-  const title = `${session.host_nickname} さんの性格診断に協力してください！ | GAP-FIVE`;
-  const description = `あなたの目から見た${session.host_nickname}さんはどんな人？完全匿名・1分で回答できます。`;
+  const effectiveHostName = (as || name || session.host_nickname).trim();
+  const title = `${effectiveHostName} さんの性格診断に協力してください！ | GAP-FIVE`;
+  const description = `あなたの目から見た${effectiveHostName}さんはどんな人？完全匿名・1分で回答できます。`;
   const ogImageUrl = `/api/og/${sessionId}?v=0`;
 
   return {
@@ -50,8 +56,9 @@ export async function generateMetadata({ params }: AnswerPageProps): Promise<Met
   };
 }
 
-export default async function AnswerPage({ params }: AnswerPageProps) {
+export default async function AnswerPage({ params, searchParams }: AnswerPageProps) {
   const { sessionId } = await params;
+  const { as, name } = await searchParams;
   const session = await getSession(sessionId);
 
   if (!session) {
@@ -59,6 +66,7 @@ export default async function AnswerPage({ params }: AnswerPageProps) {
   }
 
   const isHost = await isHostOfSession(sessionId);
+  const effectiveHostName = (as || name || session.host_nickname).trim();
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6">
@@ -70,7 +78,7 @@ export default async function AnswerPage({ params }: AnswerPageProps) {
             <span>
               {isHost
                 ? '【作成者ご本人】こちらのページを開いています'
-                : `あなたが「${session.host_nickname}」さんご本人ですか？`}
+                : `あなたが「${effectiveHostName}」さんご本人ですか？`}
             </span>
           </div>
           <p className="text-[11px] text-amber-800 leading-relaxed">
@@ -92,7 +100,7 @@ export default async function AnswerPage({ params }: AnswerPageProps) {
           </div>
         </div>
 
-        <AnswerForm session={session} />
+        <AnswerForm session={session} customHostName={effectiveHostName} />
       </div>
     </div>
   );
