@@ -17,6 +17,9 @@ function DiagnoseContent() {
   const paramName = searchParams?.get('name') || '';
   const returnToHost = searchParams?.get('returnToHost') || '';
 
+  // step: 0 = 名前入力, 1〜10 = 設問, 11 = 送信中
+  const [step, setStep] = useState<number>(0);
+
   // 管理用ニックネーム（非公開）
   const [privateNickname, setPrivateNickname] = useState(paramName);
   // 相手に見せる表示名（公開用）
@@ -35,7 +38,6 @@ function DiagnoseContent() {
 
   const effectivePublicName = isCustomPublic ? publicNickname : privateNickname;
   const answeredCount = Object.keys(answers).length;
-  const isComplete = privateNickname.trim().length > 0 && answeredCount === 10;
 
   const handlePrivateNameChange = (val: string) => {
     setPrivateNickname(val);
@@ -44,36 +46,48 @@ function DiagnoseContent() {
     }
   };
 
-  const handleAnswerChange = (index: number, val: number) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [index]: val,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleStartQuestions = (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = effectivePublicName.trim() || privateNickname.trim();
     if (!finalName) {
       setError('ニックネームを入力してください。');
       return;
     }
-    if (answeredCount < 10) {
-      setError(`まだ回答していない設問があります（残り ${10 - answeredCount} 問）。`);
+    setError(null);
+    setStep(1);
+  };
+
+  const handleAnswerSelect = (index: number, val: number) => {
+    const nextAnswers = { ...answers, [index]: val };
+    setAnswers(nextAnswers);
+
+    // 次のステップへ自動送り
+    if (index < 9) {
+      setStep(index + 2); // index 0 (Q1) -> step 2 (Q2)
+    } else {
+      // 10問目完了 -> 自動送信
+      submitAll(nextAnswers);
+    }
+  };
+
+  const submitAll = (finalAnswers: Record<number, number>) => {
+    const finalName = effectivePublicName.trim() || privateNickname.trim();
+    if (!finalName) {
+      setError('ニックネームが未入力です。最初に戻ってください。');
+      setStep(0);
       return;
     }
 
+    setStep(11); // 送信ローディング画面
     setError(null);
 
-    // インデックス順の配列に変換
-    const answersArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => answers[i]);
+    const answersArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => finalAnswers[i] ?? 4);
 
     startTransition(async () => {
       try {
         const result = await createHostSession(finalName, answersArray);
         if (result.success) {
           try {
-            // ローカル保存
             localStorage.setItem(
               'gap_recent_session',
               JSON.stringify({
@@ -83,7 +97,6 @@ function DiagnoseContent() {
               })
             );
 
-            // 相互診断の紐付けがあれば保存
             if (fromSession && returnToHost) {
               localStorage.setItem(
                 `gap_mutual_${result.sessionId}`,
@@ -98,6 +111,7 @@ function DiagnoseContent() {
         }
       } catch (err: any) {
         setError(err.message || '診断の作成に失敗しました。もう一度お試しください。');
+        setStep(10); // エラー時は設問10に戻す
       }
     });
   };
@@ -107,20 +121,34 @@ function DiagnoseContent() {
       <div className="max-w-xl mx-auto space-y-6">
         {/* ヘッダー */}
         <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>トップへ戻る</span>
-          </Link>
-          <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            {fromSession ? '相互診断モード' : '自己診断モード'}
+          {step === 0 ? (
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>トップへ戻る</span>
+            </Link>
+          ) : step <= 10 ? (
+            <button
+              type="button"
+              onClick={() => setStep((prev) => Math.max(0, prev - 1))}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{step === 1 ? '名前入力に戻る' : '前の質問に戻る'}</span>
+            </button>
+          ) : (
+            <div />
+          )}
+
+          <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">
+            {fromSession ? '相互診断モード' : '自己診断（所要時間1分）'}
           </span>
         </div>
 
         {/* 相互診断特別ヘッダーバナー */}
-        {fromSession && returnToHost && (
+        {fromSession && returnToHost && step === 0 && (
           <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md space-y-1.5 animate-fadeIn">
             <div className="flex items-center gap-2 text-xs font-bold text-indigo-200">
               <HeartHandshake className="w-4 h-4 text-pink-300" />
@@ -135,155 +163,197 @@ function DiagnoseContent() {
           </div>
         )}
 
-        {/* タイトル & 進捗 */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
-            あなたの性格を自己評価
-          </h1>
-          <p className="text-sm text-slate-500">
-            直感で「普段のあなた」に最も近い数字を選んでください。
-          </p>
-
-          <div className="pt-3">
-            <div className="flex justify-between text-xs font-bold text-slate-500 mb-1.5 px-1">
-              <span>進捗状況</span>
-              <span className="text-blue-600">{answeredCount} / 10 完了</span>
+        {/* プログレスバー（設問回答中のみ表示） */}
+        {step >= 1 && step <= 10 && (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-xs font-bold text-slate-500 px-1">
+              <span className="text-indigo-600 font-black">QUESTION {step} / 10</span>
+              <span>残り {10 - answeredCount} 問</span>
             </div>
-            <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-600 rounded-full transition-all duration-300"
+                className="h-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${(answeredCount / 10) * 100}%` }}
               />
             </div>
           </div>
-        </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ニックネーム入力＆プライバシー安心設計 */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100 space-y-4">
-            {/* 管理用ニックネーム（非公開） */}
-            <div className="space-y-1.5">
-              <label className="flex items-center justify-between text-sm font-bold text-slate-800">
-                <span className="flex items-center gap-1.5">
-                  <User className="w-4 h-4 text-blue-600" />
-                  あなたのニックネーム（管理用）
-                  <span className="text-xs text-rose-500 font-normal">※必須</span>
-                </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  <EyeOff className="w-3 h-3" />
-                  外部非公開
-                </span>
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={20}
-                placeholder="例: たろう、ミカ、本人専用名"
-                value={privateNickname}
-                onChange={(e) => handlePrivateNameChange(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-              />
-              <div className="flex items-start gap-1.5 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <span>
-                  <strong>プライバシー安心設計：</strong>この管理名は診断結果画面でのあなた専用の識別用です。外部の友達やSNSには一切漏れません。
-                </span>
-              </div>
+        {/* エラーメッセージ */}
+        {error && (
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold text-center animate-fadeIn">
+            {error}
+          </div>
+        )}
+
+        {/* STEP 0: ニックネーム入力画面 */}
+        {step === 0 && (
+          <form onSubmit={handleStartQuestions} className="space-y-6 animate-fadeIn">
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+                あなたの性格を自己評価
+              </h1>
+              <p className="text-sm text-slate-500">
+                まずはニックネームを設定し、10問の直感診断をはじめましょう。
+              </p>
             </div>
 
-            {/* 公開名の使い分けオプション */}
-            <div className="pt-2 border-t border-slate-100 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                  <span>相手に見せる表示名（公開用）</span>
-                  <span className="text-[10px] text-slate-400 font-normal">※相手によって後から変更可能</span>
-                </span>
+            <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-200/80 space-y-5">
+              {/* 管理用ニックネーム */}
+              <div className="space-y-2">
+                <label className="flex items-center justify-between text-sm font-bold text-slate-800">
+                  <span className="flex items-center gap-1.5">
+                    <User className="w-4 h-4 text-indigo-600" />
+                    あなたのニックネーム
+                    <span className="text-xs text-rose-500 font-normal">※必須</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <EyeOff className="w-3 h-3" />
+                    外部非公開
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={20}
+                  placeholder="例: けい、ミカ、たろう"
+                  value={privateNickname}
+                  onChange={(e) => handlePrivateNameChange(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all font-bold"
+                  autoFocus
+                />
+                <div className="flex items-start gap-1.5 text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>プライバシー安心設計：</strong>このニックネームはあなた専用の管理用です。外部やSNSに意図せず公開されることはありません。
+                  </span>
+                </div>
+              </div>
+
+              {/* 公開名の使い分けオプション */}
+              <div className="pt-3 border-t border-slate-100 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700">
+                    相手に見せる表示名（公開用）
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsCustomPublic(!isCustomPublic)}
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-700 underline"
+                  >
+                    {isCustomPublic ? '管理名と同じにする' : '別の表示名を設定する'}
+                  </button>
+                </div>
+
+                {isCustomPublic ? (
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      maxLength={20}
+                      placeholder="例: 田中先輩、サトシ、リーダー"
+                      value={publicNickname}
+                      onChange={(e) => setPublicNickname(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-white border border-indigo-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
+                    />
+                    <p className="text-[11px] text-indigo-600">
+                      友達が回答する際、「{publicNickname.trim() || '〇〇'} さんの印象を教えてください」と表示されます。
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-slate-400">
+                    送る相手（サークル・職場・親友）に合わせて、後からいつでも表示名を変えたURLを発行できます。
+                  </p>
+                )}
+              </div>
+
+              {/* 開始ボタン */}
+              <div className="pt-2">
                 <button
-                  type="button"
-                  onClick={() => setIsCustomPublic(!isCustomPublic)}
-                  className="text-xs font-bold text-blue-600 hover:text-blue-700 underline"
+                  type="submit"
+                  disabled={!privateNickname.trim()}
+                  className={`w-full py-4 px-6 rounded-2xl font-black text-base sm:text-lg flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 ${
+                    privateNickname.trim()
+                      ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/30'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                  }`}
                 >
-                  {isCustomPublic ? '管理名と同じにする' : '別の名前を設定する'}
+                  <Sparkles className="w-5 h-5" />
+                  <span>診断をはじめる（全10問・約1分）</span>
                 </button>
               </div>
-
-              {isCustomPublic ? (
-                <div className="space-y-1.5">
-                  <input
-                    type="text"
-                    maxLength={20}
-                    placeholder="例: 田中先輩、サトシ、たっくん"
-                    value={publicNickname}
-                    onChange={(e) => setPublicNickname(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white border border-blue-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                  />
-                  <p className="text-[11px] text-blue-600">
-                    友達が回答する際、「{publicNickname.trim() || '〇〇'} さんの印象を教えてください」と表示されます。
-                  </p>
-                </div>
-              ) : (
-                <p className="text-[11px] text-slate-400">
-                  現在は「<strong>{privateNickname.trim() || '（未入力）'}</strong>」として相手に表示されます。管理画面から、送る相手（職場・友達・SNS）に合わせていつでも表示名を変えたリンクを発行できます。
-                </p>
-              )}
             </div>
-          </div>
+          </form>
+        )}
 
-          {/* 10問の設問 */}
+        {/* STEP 1〜10: 1問1答画面 */}
+        {step >= 1 && step <= 10 && (
           <div className="space-y-4">
-            {TIPI_ITEMS.map((item, index) => (
-              <LikertScale
-                key={item.id}
-                questionNumber={item.id}
-                questionText={item.selfText}
-                value={answers[index] ?? null}
-                onChange={(val) => handleAnswerChange(index, val)}
-              />
-            ))}
-          </div>
+            <LikertScale
+              questionNumber={step}
+              totalQuestions={10}
+              questionText={TIPI_ITEMS[step - 1].selfText}
+              value={answers[step - 1] ?? null}
+              onChange={(val) => {
+                setAnswers((prev) => ({ ...prev, [step - 1]: val }));
+              }}
+              onSelectAndAdvance={(val) => handleAnswerSelect(step - 1, val)}
+              onPrev={() => setStep((prev) => Math.max(0, prev - 1))}
+              canPrev={true}
+              themeColor="blue"
+            />
 
-          {/* エラーメッセージ */}
-          {error && (
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold text-center">
-              {error}
-            </div>
-          )}
+            {/* ナビゲーション補助ボタン */}
+            <div className="flex justify-between items-center pt-2">
+              <button
+                type="button"
+                onClick={() => setStep((prev) => Math.max(0, prev - 1))}
+                className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors py-2 px-3 rounded-xl hover:bg-slate-200/60"
+              >
+                ← {step === 1 ? '名前入力に戻る' : '前の質問'}
+              </button>
 
-          {/* 送信ボタン */}
-          <div className="sticky bottom-4 pt-2">
-            <button
-              type="submit"
-              disabled={isPending || !isComplete}
-              className={`w-full py-4 px-6 rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-2 shadow-xl transition-all ${
-                isComplete && !isPending
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99]'
-                  : 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
-              }`}
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>診断セッションを作成中...</span>
-                </>
-              ) : isComplete ? (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  <span>
-                    {fromSession
-                      ? `自己診断を完了して【${returnToHost}】さんへの逆評価リンクを発行`
-                      : '自己診断を完了して共有URLを発行'}
-                  </span>
-                </>
-              ) : (
-                <span>
-                  {!privateNickname.trim()
-                    ? 'ニックネームを入力してください'
-                    : `残り ${10 - answeredCount} 問 回答してください`}
-                </span>
+              {answers[step - 1] && step < 10 && (
+                <button
+                  type="button"
+                  onClick={() => setStep((prev) => prev + 1)}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors py-2 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200"
+                >
+                  次の質問へ →
+                </button>
               )}
-            </button>
+
+              {step === 10 && answers[9] && (
+                <button
+                  type="button"
+                  onClick={() => submitAll(answers)}
+                  className="text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 transition-colors py-2 px-4 rounded-xl shadow-md"
+                >
+                  診断を完了する ✨
+                </button>
+              )}
+            </div>
           </div>
-        </form>
+        )}
+
+        {/* STEP 11: 分析中ローディング画面 */}
+        {step === 11 && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-200 text-center space-y-6 animate-fadeIn">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 mx-auto">
+              <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                あなたの性格特性を分析中...
+              </h2>
+              <p className="text-sm text-slate-500">
+                自認ラベルを算出し、友人への招待ルームを準備しています。
+              </p>
+            </div>
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
+              <div className="h-full bg-indigo-600 rounded-full animate-pulse w-3/4" />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
