@@ -218,6 +218,81 @@ export const PremiumTeaserCard: React.FC<PremiumTeaserCardProps> = ({
                   )}
                 </div>
 
+                {/* 就活・面接対策例文（アコーディオン） */}
+                <div className="rounded-xl bg-blue-500/10 border border-blue-400/20 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('careerInterview')}
+                    className="w-full p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-blue-500/15"
+                  >
+                    <span className="font-bold text-blue-200 text-xs flex items-center gap-1.5">
+                      🎓 面接・自己PRで使える回答例文（「周囲からどんな人と言われる？」対策）
+                    </span>
+                    {openSections.careerInterview ? (
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    )}
+                  </button>
+                  {openSections.careerInterview && (
+                    <div className="p-3.5 pt-0 animate-in fade-in duration-200">
+                      <p className="leading-relaxed text-blue-100 text-xs bg-black/20 p-3 rounded-xl border border-blue-400/20 italic">
+                        {report.career.interviewTemplate}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* 短所のポジティブ言い換え（アコーディオン） */}
+                <div className="rounded-xl bg-amber-500/10 border border-amber-400/20 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('careerReframe')}
+                    className="w-full p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-amber-500/15"
+                  >
+                    <span className="font-bold text-amber-200 text-xs flex items-center gap-1.5">
+                      🔄 短所のポジティブ言い換え・リカバリー術
+                    </span>
+                    {openSections.careerReframe ? (
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    )}
+                  </button>
+                  {openSections.careerReframe && (
+                    <div className="p-3.5 pt-0 animate-in fade-in duration-200">
+                      <p className="leading-relaxed text-amber-100 text-xs bg-black/20 p-3 rounded-xl border border-amber-400/20">
+                        {report.career.weaknessReframe}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* 1on1・マネジメント対話ヒント（アコーディオン） */}
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-400/20 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('career1on1')}
+                    className="w-full p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-emerald-500/15"
+                  >
+                    <span className="font-bold text-emerald-200 text-xs flex items-center gap-1.5">
+                      💬 職場・1on1で本音を引き出す対話のヒント
+                    </span>
+                    {openSections.career1on1 ? (
+                      <ChevronUp className="w-4 h-4 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    )}
+                  </button>
+                  {openSections.career1on1 && (
+                    <div className="p-3.5 pt-0 animate-in fade-in duration-200">
+                      <p className="leading-relaxed text-emerald-100 text-xs bg-black/20 p-3 rounded-xl border border-emerald-400/20">
+                        {report.career.workplaceCommunicationTip}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {/* 相棒タイプ＆成長アドバイス */}
                 <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-xs space-y-2">
                   <p><strong className="text-amber-300">🤝 相棒タイプ:</strong> {report.career.bestPartnerType}</p>
@@ -516,9 +591,15 @@ export const PremiumTeaserCard: React.FC<PremiumTeaserCardProps> = ({
           </>
         )}
       </button>
-      <p className="text-[11px] text-slate-400 text-center">
-        ※Apple Pay / Google Pay / クレジットカード対応。1回買い切りで永久閲覧可能です。
-      </p>
+
+      <div className="space-y-1 text-center">
+        <p className="text-xs font-bold text-amber-300">
+          ※追加請求なし・1回限りの完全買い切りです（月額課金・自動更新等は一切ありません）
+        </p>
+        <p className="text-[11px] text-slate-400">
+          Apple Pay / Google Pay / クレジットカード対応。ご購入後はこのページで永久にご覧いただけます。
+        </p>
+      </div>
     </div>
   );
 };
