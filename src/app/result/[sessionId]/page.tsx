@@ -15,7 +15,7 @@ import { ResultRevealModal } from '@/components/ResultRevealModal';
 import { PremiumTeaserCard } from '@/components/PremiumTeaserCard';
 import { PairCompatibilityCard } from '@/components/PairCompatibilityCard';
 import { RecommendationCard } from '@/components/RecommendationCard';
-import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
 interface ResultPageProps {
@@ -171,6 +171,22 @@ export default async function ResultPage({ params }: ResultPageProps) {
               暫定速報（{answerCount}名の回答に基づく分析）
             </span>
           )}
+        </div>
+
+        {/* 結果URL保存バー（紛失・見失い防止） */}
+        <div className="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-2xs">
+          <div className="flex items-center gap-2 font-medium">
+            <Bookmark className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>ブラウザを閉じても見返せるよう、結果URLを保存しておきましょう</span>
+          </div>
+          <a
+            href={`https://line.me/R/msg/text/?${encodeURIComponent(`【GAP-FIVE】${session.host_nickname}さんの性格診断結果ページ：\n${currentUrl}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="self-end sm:self-auto shrink-0 px-3.5 py-1.5 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-2xs transition-colors flex items-center gap-1.5"
+          >
+            <span>LINEに保存</span>
+          </a>
         </div>
 
         {/* 結果発表ドラマチック演出モーダル & 再生ボタン */}
