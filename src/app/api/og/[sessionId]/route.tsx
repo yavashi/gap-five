@@ -175,63 +175,70 @@ export async function GET(
             justifyContent: 'center',
           }}
         >
-          <svg width="440" height="440" viewBox="0 0 440 440">
-            {/* グリッド線 */}
-            {gridLevels.map((level) => {
-              const pts = getPolygonPoints(
-                { E: level, A: level, C: level, S: level, O: level },
-                220,
-                220,
-                radius
-              );
-              return (
-                <polygon
-                  key={level}
-                  points={pts}
-                  fill="none"
-                  stroke={level === 4.0 ? '#64748b' : '#334155'}
-                  strokeWidth={level === 4.0 ? '2' : '1'}
-                />
-              );
-            })}
+          <div style={{ position: 'relative', width: '440px', height: '440px', display: 'flex' }}>
+            <svg width="440" height="440" viewBox="0 0 440 440">
+              {/* グリッド線 */}
+              {gridLevels.map((level) => {
+                const pts = getPolygonPoints(
+                  { E: level, A: level, C: level, S: level, O: level },
+                  220,
+                  220,
+                  radius
+                );
+                return (
+                  <polygon
+                    key={level}
+                    points={pts}
+                    fill="none"
+                    stroke={level === 4.0 ? '#64748b' : '#334155'}
+                    strokeWidth={level === 4.0 ? '2' : '1'}
+                  />
+                );
+              })}
 
-            {/* 自己ポリゴン（青） */}
-            <polygon
-              points={getPolygonPoints(session.self_scores, 220, 220, radius)}
-              fill="rgba(59, 130, 246, 0.4)"
-              stroke="#3b82f6"
-              strokeWidth="4"
-            />
+              {/* 自己ポリゴン（青） */}
+              <polygon
+                points={getPolygonPoints(session.self_scores, 220, 220, radius)}
+                fill="rgba(59, 130, 246, 0.4)"
+                stroke="#3b82f6"
+                strokeWidth="4"
+              />
 
-            {/* 他者ポリゴン（赤） */}
-            <polygon
-              points={getPolygonPoints(averagePeerScores, 220, 220, radius)}
-              fill="rgba(244, 63, 94, 0.4)"
-              stroke="#f43f5e"
-              strokeWidth="4"
-            />
+              {/* 他者ポリゴン（赤） */}
+              <polygon
+                points={getPolygonPoints(averagePeerScores, 220, 220, radius)}
+                fill="rgba(244, 63, 94, 0.4)"
+                stroke="#f43f5e"
+                strokeWidth="4"
+              />
+            </svg>
 
-            {/* ラベル */}
+            {/* ラベル（SatoriではSVG内textが非対応のためHTMLで配置） */}
             {TRAITS.map((trait, i) => {
               const angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
               const lx = 220 + (radius + 28) * Math.cos(angle);
               const ly = 220 + (radius + 28) * Math.sin(angle);
               return (
-                <text
+                <div
                   key={trait}
-                  x={lx}
-                  y={ly}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="#e2e8f0"
-                  fontSize="16"
-                  fontWeight="bold"
+                  style={{
+                    position: 'absolute',
+                    left: `${lx - 45}px`,
+                    top: `${ly - 12}px`,
+                    width: '90px',
+                    textAlign: 'center',
+                    color: '#e2e8f0',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
                 >
                   {TRAIT_NAMES[trait]}
-                </text>
+                </div>
               );
             })}
-          </svg>
+          </div>
 
           {/* 凡例 */}
           <div
