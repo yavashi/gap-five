@@ -53,6 +53,7 @@ export async function createHostSession(nickname: string, answers: number[]) {
 
   // Supabase未設定または失敗時はインメモリストアに保存
   if (!savedToSupabase) {
+    console.warn('Supabase保存スキップ/失敗。原因: supabaseClient=' + !!supabase);
     memoryDb.sessions.set(sessionId, sessionData);
     memoryDb.peerAnswers.set(sessionId, []);
   }
