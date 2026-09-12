@@ -1,20 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { PairCompatibility } from '@/lib/core/compatibility';
-import { Users, Sparkles, Heart, ShieldAlert, MessageCircle, Lightbulb, Lock, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { PeerSessionInfo } from '@/lib/actions/session';
+import { Users, Sparkles, Heart, ShieldAlert, MessageCircle, Lightbulb, Lock, ArrowRight, Loader2, CheckCircle2, UserCheck } from 'lucide-react';
 
 interface PairCompatibilityCardProps {
   sessionId: string;
   compatibilities: PairCompatibility[];
   hostNickname: string;
+  peerSessionMap?: Record<string, PeerSessionInfo>;
 }
 
 export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
   sessionId,
   compatibilities,
   hostNickname,
+  peerSessionMap = {},
 }) => {
   const searchParams = useSearchParams();
   const pairUnlockedFromUrl = searchParams?.get('pairUnlocked');
@@ -286,6 +290,65 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
           </div>
         </div>
       )}
+
+      {/* 相手の診断ページへのアクセス導線（相互診断リンク） */}
+      {(() => {
+        const pInfo = peerSessionMap[current.peerNickname];
+        if (pInfo?.sessionId) {
+          return (
+            <div className="p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left animate-fadeIn">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-950">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  <span>{current.peerNickname} さんの診断ページ</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  {pInfo.hasAnswered
+                    ? `${current.peerNickname} さんの確定二つ名・診断結果を見に行けます`
+                    : `あなたから見た ${current.peerNickname} さんの性格を採点してあげましょう！`}
+                </p>
+              </div>
+              <div className="shrink-0">
+                {pInfo.hasAnswered ? (
+                  <Link
+                    href={`/result/${pInfo.sessionId}`}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+                  >
+                    <span>{current.peerNickname} さんの結果を見る</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/answer/${pInfo.sessionId}`}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+                  >
+                    <span>{current.peerNickname} さんを逆評価する</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-left text-xs">
+              <div className="text-slate-600">
+                <span className="font-bold text-slate-800">{current.peerNickname}</span> さんはまだ診断を作っていないようです
+              </div>
+              <a
+                href={`https://line.me/R/msg/text/?${encodeURIComponent(
+                  `【GAP-FIVE】${current.peerNickname}ちゃんも自分のギャップ診断を作ってみて！私にも採点させて〜！\nhttps://gap-five-nine.vercel.app/diagnose`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-1.5 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold shadow-2xs transition-colors inline-flex items-center justify-center gap-1.5 shrink-0"
+              >
+                <span>LINEで診断をおねだり</span>
+              </a>
+            </div>
+          );
+        }
+      })()}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getSession } from '@/lib/actions/session';
+import { getSession, isHostOfSession, getPeerSessionMap } from '@/lib/actions/session';
 import { getPeerAnswers } from '@/lib/actions/peer';
 import { calculateAveragePeerScores } from '@/lib/core/tipi';
 import { generateFinalResult } from '@/lib/core/gap';
@@ -148,6 +148,13 @@ export default async function ResultPage({ params }: ResultPageProps) {
       a.peer_nickname
     )
   );
+
+  // ホスト本人かどうかをCookie認証で判定
+  const isHost = await isHostOfSession(sessionId);
+
+  // 回答者たちの診断セッション情報を取得（相互診断リンク用）
+  const peerNicknames = peerAnswers.map((a) => a.peer_nickname);
+  const peerSessionMap = await getPeerSessionMap(session.host_nickname, peerNicknames);
 
   // コメントがある回答のみ抽出
   const comments = peerAnswers.filter((a) => a.comment && a.comment.trim().length > 0);
@@ -348,19 +355,33 @@ export default async function ResultPage({ params }: ResultPageProps) {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    {comments.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 shadow-xs space-y-1.5"
-                      >
-                        <p className="text-xs font-medium text-slate-800 leading-relaxed italic">
-                          「{item.comment}」
-                        </p>
-                        <div className="text-[11px] font-bold text-amber-800 text-right">
-                          — {item.peer_nickname} さん
+                    {comments.map((item) => {
+                      const peerSession = peerSessionMap[item.peer_nickname];
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 shadow-xs space-y-2 flex flex-col justify-between"
+                        >
+                          <p className="text-xs font-medium text-slate-800 leading-relaxed italic">
+                            「{item.comment}」
+                          </p>
+                          <div className="flex items-center justify-between pt-1 border-t border-amber-200/40">
+                            <div className="text-[11px] font-bold text-amber-900">
+                              — {item.peer_nickname} さん
+                            </div>
+                            {peerSession?.sessionId && (
+                              <Link
+                                href={peerSession.hasAnswered ? `/result/${peerSession.sessionId}` : `/answer/${peerSession.sessionId}`}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-700 hover:text-indigo-900 bg-white/80 hover:bg-white px-2 py-0.5 rounded-md border border-indigo-200/60 shadow-2xs transition-colors"
+                              >
+                                <span>{peerSession.hasAnswered ? '診断結果を見る' : '逆評価する'}</span>
+                                <ArrowRight className="w-2.5 h-2.5" />
+                              </Link>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ) : (
@@ -371,39 +392,73 @@ export default async function ResultPage({ params }: ResultPageProps) {
                 </div>
               )}
 
-              {/* 回答者との個別相性カルテ（1対1ケミストリー） */}
+              {/* 回答者との個別相性カルテ（1対1ケミストリー & 相互診断リンク） */}
               {pairCompatibilities.length > 0 && (
                 <PairCompatibilityCard
                   sessionId={sessionId}
                   hostNickname={session.host_nickname}
                   compatibilities={pairCompatibilities}
+                  peerSessionMap={peerSessionMap}
                 />
               )}
-
-              {/* ホスト管理画面への復帰リンク */}
-              <div className="p-5 rounded-2xl bg-indigo-50/70 border border-indigo-100 text-center space-y-2">
-                <p className="text-xs font-bold text-indigo-900">もっと友達の回答を集めたいですか？</p>
-                <Link
-                  href={`/me/${sessionId}`}
-                  className="inline-flex items-center gap-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-bold underline underline-offset-4"
-                >
-                  <span>ホスト管理画面でLINEの招待メッセージを送る →</span>
-                </Link>
-              </div>
             </>
           }
         />
 
-        {/* 自分も診断してみる（相互送客バイラル導線） */}
-        <div className="text-center pt-2 pb-4">
-          <Link
-            href="/diagnose"
-            className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-base shadow-lg transition-all hover:scale-[1.01]"
-          >
-            <span>あなたもギャップ診断を作ってみる（無料）</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
+        {/* 最下部アクション（ホスト本人か第三者かでスマートに出し分け） */}
+        {isHost ? (
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white text-center space-y-4 shadow-xl border border-indigo-500/30 animate-fadeIn">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-400/30">
+              <span>👑</span>
+              <span>ホスト専用メニュー</span>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-white">
+                もっと回答を集めて診断精度を高めますか？
+              </h3>
+              <p className="text-xs text-indigo-200">
+                LINEで友達に回答を依頼すると、新しい二つ名や相性カルテがさらに解放されます。
+              </p>
+            </div>
+            <Link
+              href={`/me/${sessionId}`}
+              className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-600 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white font-black text-base shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <span>ホスト管理画面へ（LINEで友達を招待する）</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <div className="pt-1">
+              <Link
+                href="/diagnose"
+                className="text-xs text-slate-400 hover:text-slate-200 underline underline-offset-4 transition-colors"
+              >
+                ※新しく別のデータで診断を作り直したい場合はこちら（無料）
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 text-white text-center space-y-4 shadow-xl border border-slate-700 animate-fadeIn">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/20 text-yellow-300 text-xs font-bold border border-yellow-400/30">
+              <span>✨</span>
+              <span>この結果を見たあなたへ</span>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-white">
+                {session.host_nickname} さんの診断はいかがでしたか？
+              </h3>
+              <p className="text-xs text-slate-300">
+                あなたの「自称」と「友達から見えた実態」のギャップも暴いてみませんか？
+              </p>
+            </div>
+            <Link
+              href={`/diagnose?fromSession=${sessionId}&returnToHost=${encodeURIComponent(session.host_nickname)}`}
+              className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 hover:from-amber-300 hover:to-purple-500 text-white font-black text-base shadow-lg shadow-pink-500/30 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <span>あなたもギャップ診断を作ってみる（無料・1分）</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        )}
 
         {/* 法的情報リンク・フッター */}
         <footer className="pt-4 pb-8 text-center text-xs text-slate-400 space-x-3">

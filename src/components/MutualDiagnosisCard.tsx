@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { HeartHandshake, ArrowRight, Sparkles, Send, Copy, Check, MessageSquare } from 'lucide-react';
+import { HeartHandshake, ArrowRight, Sparkles, Send, Copy, Check, MessageSquare, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { PeerSessionInfo } from '@/lib/actions/session';
 
 interface PeerItem {
   id: string;
@@ -16,6 +17,7 @@ interface MutualDiagnosisCardProps {
   hostNickname: string;
   peerAnswers: PeerItem[];
   baseUrl: string;
+  peerSessionMap?: Record<string, PeerSessionInfo>;
 }
 
 export const MutualDiagnosisCard: React.FC<MutualDiagnosisCardProps> = ({
@@ -23,6 +25,7 @@ export const MutualDiagnosisCard: React.FC<MutualDiagnosisCardProps> = ({
   hostNickname,
   peerAnswers,
   baseUrl,
+  peerSessionMap = {},
 }) => {
   const [mutualTarget, setMutualTarget] = useState<{
     targetSessionId: string;
@@ -153,33 +156,66 @@ export const MutualDiagnosisCard: React.FC<MutualDiagnosisCardProps> = ({
 
                   {/* 相互診断アクションボタン群 */}
                   <div className="pt-1 flex flex-wrap items-center gap-2">
-                    <a
-                      href={lineUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 py-2 px-3 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-xs transition-colors"
-                    >
-                      <Send className="w-3 h-3" />
-                      <span>{item.peer_nickname}さんに逆診断依頼をLINE送信</span>
-                    </a>
+                    {(() => {
+                      const pInfo = peerSessionMap[item.peer_nickname];
+                      if (pInfo?.sessionId) {
+                        return (
+                          <>
+                            {pInfo.hasAnswered ? (
+                              <Link
+                                href={`/result/${pInfo.sessionId}`}
+                                className="inline-flex items-center gap-1.5 py-2 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors"
+                              >
+                                <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                                <span>{item.peer_nickname} さんの診断結果を見る</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </Link>
+                            ) : (
+                              <Link
+                                href={`/answer/${pInfo.sessionId}`}
+                                className="inline-flex items-center gap-1.5 py-2 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-xs transition-colors"
+                              >
+                                <HeartHandshake className="w-3.5 h-3.5 text-white" />
+                                <span>{item.peer_nickname} さんを逆評価する</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </Link>
+                            )}
+                          </>
+                        );
+                      } else {
+                        return (
+                          <>
+                            <a
+                              href={lineUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 py-2 px-3 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-xs transition-colors"
+                            >
+                              <Send className="w-3 h-3" />
+                              <span>{item.peer_nickname}さんに診断依頼をLINE送信</span>
+                            </a>
 
-                    <button
-                      type="button"
-                      onClick={() => handleCopyReverseInvite(item.peer_nickname)}
-                      className="inline-flex items-center gap-1 py-2 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition-colors"
-                    >
-                      {isCopied ? (
-                        <>
-                          <Check className="w-3 h-3 text-emerald-600" />
-                          <span className="text-emerald-600">依頼文コピー済</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3 text-slate-500" />
-                          <span>依頼文コピー</span>
-                        </>
-                      )}
-                    </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyReverseInvite(item.peer_nickname)}
+                              className="inline-flex items-center gap-1 py-2 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition-colors"
+                            >
+                              {isCopied ? (
+                                <>
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <span className="text-emerald-600">依頼文コピー済</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3 text-slate-500" />
+                                  <span>依頼文コピー</span>
+                                </>
+                              )}
+                            </button>
+                          </>
+                        );
+                      }
+                    })()}
 
                     <Link
                       href={`/result/${sessionId}`}

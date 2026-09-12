@@ -121,3 +121,83 @@ export async function isHostOfSession(sessionId: string): Promise<boolean> {
   const memorySession = memoryDb.sessions.get(sessionId);
   return memorySession?.secret_key === hostCookie;
 }
+
+export interface PeerSessionInfo {
+  peerNickname: string;
+  sessionId?: string;
+  hasAnswered?: boolean;
+  answerCount?: number;
+}
+
+export async function getPeerSessionMap(
+  hostNickname: string,
+  peerNicknames: string[]
+): Promise<Record<string, PeerSessionInfo>> {
+  const result: Record<string, PeerSessionInfo> = {};
+  const uniquePeers = Array.from(new Set(peerNicknames.filter(Boolean)));
+  if (uniquePeers.length === 0) return result;
+
+  const supabase = await createClient();
+  if (supabase) {
+    const { data: sessions } = await supabase
+      .from('sessions')
+      .select('id, host_nickname, created_at')
+      .in('host_nickname', uniquePeers)
+      .order('created_at', { ascending: false });
+
+    if (sessions && sessions.length > 0) {
+      const sessionMap: Record<string, string> = {};
+      for (const s of sessions) {
+        if (!sessionMap[s.host_nickname]) {
+          sessionMap[s.host_nickname] = s.id;
+        }
+      }
+
+      const sessionIds = Object.values(sessionMap);
+      const { data: peerAnswers } = await supabase
+        .from('peer_answers')
+        .select('session_id, peer_nickname')
+        .in('session_id', sessionIds);
+
+      for (const peerName of uniquePeers) {
+        const pSessionId = sessionMap[peerName];
+        if (pSessionId) {
+          const answersForPSession = (peerAnswers || []).filter((a) => a.session_id === pSessionId);
+          const hostAnswered = answersForPSession.some((a) => {
+            const h = hostNickname.toLowerCase();
+            const p = a.peer_nickname.toLowerCase();
+            return p === h || p.includes(h) || h.includes(p);
+          });
+          result[peerName] = {
+            peerNickname: peerName,
+            sessionId: pSessionId,
+            hasAnswered: hostAnswered,
+            answerCount: answersForPSession.length,
+          };
+        } else {
+          result[peerName] = {
+            peerNickname: peerName,
+          };
+        }
+      }
+      return result;
+    }
+  }
+
+  // インメモリフォールバック
+  for (const peerName of uniquePeers) {
+    let foundSessionId: string | undefined;
+    for (const [sId, sData] of memoryDb.sessions.entries()) {
+      if (sData.host_nickname === peerName) {
+        foundSessionId = sId;
+        break;
+      }
+    }
+    result[peerName] = {
+      peerNickname: peerName,
+      sessionId: foundSessionId,
+    };
+  }
+
+  return result;
+}

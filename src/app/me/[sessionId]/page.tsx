@@ -1,7 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getSession, isHostOfSession } from '@/lib/actions/session';
+import { getSession, isHostOfSession, getPeerSessionMap } from '@/lib/actions/session';
 import { getPeerAnswers } from '@/lib/actions/peer';
 import { ShareButtons } from '@/components/ShareButtons';
 import { MutualDiagnosisCard } from '@/components/MutualDiagnosisCard';
@@ -26,6 +26,9 @@ export default async function MePage({ params }: MePageProps) {
   const isHost = await isHostOfSession(sessionId);
   const peerAnswers = await getPeerAnswers(sessionId);
   const answerCount = peerAnswers.length;
+
+  const peerNicknames = peerAnswers.map((a) => a.peer_nickname);
+  const peerSessionMap = await getPeerSessionMap(session.host_nickname, peerNicknames);
 
   // ホスト名・オリジンの取得
   const headersList = await headers();
@@ -145,6 +148,7 @@ export default async function MePage({ params }: MePageProps) {
           hostNickname={session.host_nickname}
           peerAnswers={peerAnswers}
           baseUrl={baseUrl}
+          peerSessionMap={peerSessionMap}
         />
       </div>
     </div>
