@@ -16,6 +16,7 @@ import { PremiumTeaserCard } from '@/components/PremiumTeaserCard';
 import { PairCompatibilityCard } from '@/components/PairCompatibilityCard';
 import { RecommendationCard } from '@/components/RecommendationCard';
 import { GapVisualCard } from '@/components/GapVisualCard';
+import { ResultTabContainer } from '@/components/ResultTabContainer';
 import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -190,176 +191,198 @@ export default async function ResultPage({ params }: ResultPageProps) {
           </a>
         </div>
 
-        {/* 結果発表ドラマチック演出モーダル & 再生ボタン */}
-        <ResultRevealModal
-          sessionId={sessionId}
-          hostNickname={session.host_nickname}
-          finalTitle={finalResult.title}
-          selfLabel={finalResult.selfLabel}
-          peerRealityLabel={finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
-          isRare={finalResult.isRare}
-          rarityBadge={finalResult.rarityBadge}
-          answerCount={answerCount}
-        />
+        {/* 3大スマートタブコンテナ */}
+        <ResultTabContainer
+          commentsCount={comments.length}
+          pairCount={pairCompatibilities.length}
+          gapContent={
+            <>
+              {/* 結果発表ドラマチック演出モーダル & 再生ボタン */}
+              <ResultRevealModal
+                sessionId={sessionId}
+                hostNickname={session.host_nickname}
+                finalTitle={finalResult.title}
+                selfLabel={finalResult.selfLabel}
+                peerRealityLabel={finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
+                isRare={finalResult.isRare}
+                rarityBadge={finalResult.rarityBadge}
+                answerCount={answerCount}
+              />
 
-        {/* 確定称号メインカード */}
-        <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              {/* 確定称号メインカード */}
+              <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-indigo-300 tracking-wider uppercase">
-                {session.host_nickname} さんの確定二つ名
-              </span>
-              {finalResult.isRare && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-400 via-rose-400 to-purple-400 text-slate-900 shadow-sm animate-pulse">
-                  ✨ {finalResult.rarityBadge}
-                </span>
-              )}
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 leading-tight">
-              {finalResult.title}
-            </h1>
-          </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-indigo-300 tracking-wider uppercase">
+                      {session.host_nickname} さんの確定二つ名
+                    </span>
+                    {finalResult.isRare && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-400 via-rose-400 to-purple-400 text-slate-900 shadow-sm animate-pulse">
+                        ✨ {finalResult.rarityBadge}
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 leading-tight">
+                    {finalResult.title}
+                  </h1>
+                </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <span className="text-slate-400 block font-bold">本人の自認</span>
-              <span className="font-extrabold text-blue-300">{finalResult.selfLabel}</span>
-            </div>
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <span className="text-slate-400 block font-bold">周囲から見た実態</span>
-              <span className="font-extrabold text-rose-300">
-                {finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* 暴かれたズレの対比ビジュアルカード（自認 vs 実態） */}
-        <GapVisualCard
-          hostNickname={session.host_nickname}
-          selfLabel={finalResult.selfLabel}
-          gapName={finalResult.primaryGap ? finalResult.primaryGap.name : '等身大パーソン'}
-          gapTrait={finalResult.primaryGap?.trait}
-          gapType={finalResult.primaryGap?.type}
-        />
-
-        {/* 重ね合わせレーダーチャート */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
-          <div className="text-center space-y-1">
-            <h2 className="text-base font-bold text-slate-900 flex items-center justify-center gap-2">
-              <Award className="w-5 h-5 text-blue-600" />
-              <span>自己 vs 周囲 ギャップチャート</span>
-            </h2>
-            <p className="text-xs text-slate-500">
-              青（自己評価）と赤（周囲の平均評価）のズレがあなたの隠れた二面性です。
-            </p>
-          </div>
-
-          <RadarChart
-            selfScores={session.self_scores}
-            peerScores={averagePeerScores}
-            selfLabel={finalResult.selfLabel}
-          />
-        </div>
-
-        {/* 心理学的解説 */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            <span>自称と実態の心理解説</span>
-          </h2>
-          <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            {finalResult.description}
-          </p>
-        </div>
-
-        {/* 5因子ごとの詳細ギャップリスト */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
-          <h2 className="text-base font-bold text-slate-900">
-            5因子のスコア詳細比較
-          </h2>
-          <TraitBarList
-            selfScores={session.self_scores}
-            peerScores={averagePeerScores}
-          />
-        </div>
-
-        {/* 深層心理トリセツ（完全版プレミアムレポート・Stripe決済） */}
-        <PremiumTeaserCard
-          sessionId={sessionId}
-          hostNickname={session.host_nickname}
-          report={premiumReport}
-        />
-
-        {/* 友人たちからの一言コメントカード群 */}
-        {comments.length > 0 && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-blue-600" />
-                <span>友人たちからの生の声</span>
-              </h2>
-              <span className="text-xs text-slate-400">{comments.length}件のメッセージ</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              {comments.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 shadow-xs space-y-1.5"
-                >
-                  <p className="text-xs font-medium text-slate-800 leading-relaxed italic">
-                    「{item.comment}」
-                  </p>
-                  <div className="text-[11px] font-bold text-amber-800 text-right">
-                    — {item.peer_nickname} さん
+                <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                    <span className="text-slate-400 block font-bold">本人の自認</span>
+                    <span className="font-extrabold text-blue-300">{finalResult.selfLabel}</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                    <span className="text-slate-400 block font-bold">周囲から見た実態</span>
+                    <span className="font-extrabold text-rose-300">
+                      {finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
 
-        {/* 回答者との個別相性カルテ（1対1ケミストリー） */}
-        {pairCompatibilities.length > 0 && (
-          <PairCompatibilityCard
-            sessionId={sessionId}
-            hostNickname={session.host_nickname}
-            compatibilities={pairCompatibilities}
-          />
-        )}
+              {/* 暴かれたズレの対比ビジュアルカード（自認 vs 実態） */}
+              <GapVisualCard
+                hostNickname={session.host_nickname}
+                selfLabel={finalResult.selfLabel}
+                gapName={finalResult.primaryGap ? finalResult.primaryGap.name : '等身大パーソン'}
+                gapTrait={finalResult.primaryGap?.trait}
+                gapType={finalResult.primaryGap?.type}
+              />
 
-        {/* SNSシェアエリア */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
-          <h2 className="text-base font-bold text-slate-900 text-center">
-            診断結果をシェアする
-          </h2>
-          <ShareButtons
-            shareUrl={currentUrl}
-            hostNickname={session.host_nickname}
-            isResult={true}
-            resultTitle={finalResult.title}
-            sessionId={sessionId}
-          />
-        </div>
+              {/* SNSシェアエリア（即座にシェア可能） */}
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                <h2 className="text-base font-bold text-slate-900 text-center">
+                  この二つ名・結果画像をシェアする
+                </h2>
+                <ShareButtons
+                  shareUrl={currentUrl}
+                  hostNickname={session.host_nickname}
+                  isResult={true}
+                  resultTitle={finalResult.title}
+                  sessionId={sessionId}
+                />
+              </div>
+            </>
+          }
+          scienceContent={
+            <>
+              {/* 重ね合わせレーダーチャート */}
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div className="text-center space-y-1">
+                  <h2 className="text-base font-bold text-slate-900 flex items-center justify-center gap-2">
+                    <Award className="w-5 h-5 text-blue-600" />
+                    <span>自己 vs 周囲 ギャップチャート</span>
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    青（自己評価）と赤（周囲の平均評価）のズレがあなたの隠れた二面性です。
+                  </p>
+                </div>
 
-        {/* 性格タイプ連動おすすめサービス（アフィリエイト） */}
-        <RecommendationCard
-          selfScores={session.self_scores}
-          peerScores={averagePeerScores}
+                <RadarChart
+                  selfScores={session.self_scores}
+                  peerScores={averagePeerScores}
+                  selfLabel={finalResult.selfLabel}
+                />
+              </div>
+
+              {/* 心理学的解説 */}
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-500" />
+                  <span>自称と実態の心理解説</span>
+                </h2>
+                <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  {finalResult.description}
+                </p>
+              </div>
+
+              {/* 5因子ごとの詳細ギャップリスト */}
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                <h2 className="text-base font-bold text-slate-900">
+                  5因子のスコア詳細比較
+                </h2>
+                <TraitBarList
+                  selfScores={session.self_scores}
+                  peerScores={averagePeerScores}
+                />
+              </div>
+
+              {/* 深層心理トリセツ（完全版プレミアムレポート・Stripe決済） */}
+              <PremiumTeaserCard
+                sessionId={sessionId}
+                hostNickname={session.host_nickname}
+                report={premiumReport}
+              />
+
+              {/* 性格タイプ連動おすすめサービス（アフィリエイト） */}
+              <RecommendationCard
+                selfScores={session.self_scores}
+                peerScores={averagePeerScores}
+              />
+            </>
+          }
+          friendsContent={
+            <>
+              {/* 友人たちからの一言コメントカード群 */}
+              {comments.length > 0 ? (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5 text-indigo-600" />
+                      <span>友人たちからの生の声</span>
+                    </h2>
+                    <span className="text-xs text-slate-400">{comments.length}件のメッセージ</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    {comments.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 shadow-xs space-y-1.5"
+                      >
+                        <p className="text-xs font-medium text-slate-800 leading-relaxed italic">
+                          「{item.comment}」
+                        </p>
+                        <div className="text-[11px] font-bold text-amber-800 text-right">
+                          — {item.peer_nickname} さん
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white rounded-3xl p-8 text-center space-y-2 border border-slate-200/80">
+                  <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-sm font-bold text-slate-700">まだメッセージはありません</p>
+                  <p className="text-xs text-slate-400">友人が回答時にコメントを入力するとここに表示されます。</p>
+                </div>
+              )}
+
+              {/* 回答者との個別相性カルテ（1対1ケミストリー） */}
+              {pairCompatibilities.length > 0 && (
+                <PairCompatibilityCard
+                  sessionId={sessionId}
+                  hostNickname={session.host_nickname}
+                  compatibilities={pairCompatibilities}
+                />
+              )}
+
+              {/* ホスト管理画面への復帰リンク */}
+              <div className="p-5 rounded-2xl bg-indigo-50/70 border border-indigo-100 text-center space-y-2">
+                <p className="text-xs font-bold text-indigo-900">もっと友達の回答を集めたいですか？</p>
+                <Link
+                  href={`/me/${sessionId}`}
+                  className="inline-flex items-center gap-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-bold underline underline-offset-4"
+                >
+                  <span>ホスト管理画面でLINEの招待メッセージを送る →</span>
+                </Link>
+              </div>
+            </>
+          }
         />
-
-        {/* ホスト管理画面への復帰リンク */}
-        <div className="text-center pt-1 pb-2">
-          <Link
-            href={`/me/${sessionId}`}
-            className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline underline-offset-4"
-          >
-            <span>← あなたの診断ルーム（回答の追加募集・管理画面）に戻る</span>
-          </Link>
-        </div>
 
         {/* 自分も診断してみる（相互送客バイラル導線） */}
         <div className="text-center pt-2 pb-4">

@@ -27,19 +27,13 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* 診断結果サンプル（イラスト対比 ＆ レーダーチャート完備） */}
-        <SampleResultShowcase />
-
-        {/* 前回の診断復帰カード */}
-        <RecentSessionCard />
-
-        {/* 診断開始ボタン */}
-        <div className="pt-1 space-y-2">
+        {/* 診断開始ボタン（ファーストビュー直結） */}
+        <div className="pt-2 space-y-2">
           <Link
             href="/diagnose"
-            className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black text-base sm:text-lg shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black text-base sm:text-lg shadow-xl shadow-blue-500/30 transition-all hover:scale-[1.01] active:scale-[0.99]"
           >
-            <span>無料で診断をはじめる（約2分）</span>
+            <span>無料で診断をはじめる（約1分）</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-[11px] text-slate-400">
@@ -48,22 +42,33 @@ export default function HomePage() {
         </div>
 
         {/* 3つの安心ポイント */}
-        <div className="grid grid-cols-3 gap-2 pt-2 text-center">
-          <div className="p-2.5 rounded-2xl bg-white border border-slate-100 shadow-2xs space-y-1">
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="p-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
             <ShieldCheck className="w-4 h-4 text-emerald-500 mx-auto" />
             <span className="block text-[11px] font-bold text-slate-700">登録不要</span>
             <span className="block text-[9px] text-slate-400">個人情報の入力なし</span>
           </div>
-          <div className="p-2.5 rounded-2xl bg-white border border-slate-100 shadow-2xs space-y-1">
+          <div className="p-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
             <Zap className="w-4 h-4 text-amber-500 mx-auto" />
-            <span className="block text-[11px] font-bold text-slate-700">10問・2分</span>
+            <span className="block text-[11px] font-bold text-slate-700">10問・1分</span>
             <span className="block text-[9px] text-slate-400">直感タップですぐ完了</span>
           </div>
-          <div className="p-2.5 rounded-2xl bg-white border border-slate-100 shadow-2xs space-y-1">
+          <div className="p-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
             <Users className="w-4 h-4 text-blue-500 mx-auto" />
             <span className="block text-[11px] font-bold text-slate-700">完全匿名集計</span>
             <span className="block text-[9px] text-slate-400">誰の点数かは非公開</span>
           </div>
+        </div>
+
+        {/* 前回の診断復帰カード */}
+        <RecentSessionCard />
+
+        {/* 診断結果サンプル（イラスト対比 ＆ レーダーチャート完備） */}
+        <div className="pt-2">
+          <div className="text-center pb-2">
+            <span className="text-xs font-bold text-slate-400">▼ 診断結果の見本イメージ</span>
+          </div>
+          <SampleResultShowcase />
         </div>
 
         <footer className="pt-6 pb-2 text-center text-xs text-slate-400 space-x-3">
