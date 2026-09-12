@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getSession, isHostOfSession } from '@/lib/actions/session';
 import { getPeerAnswers } from '@/lib/actions/peer';
 import { ShareButtons } from '@/components/ShareButtons';
+import { MutualDiagnosisCard } from '@/components/MutualDiagnosisCard';
 import { Sparkles, Users, Lock, Unlock, ArrowRight, ShieldCheck, MessageSquare, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -68,7 +69,7 @@ export default async function MePage({ params }: MePageProps) {
             </p>
           </div>
         </div>
-
+ 
         {/* URL保存・迷子防止ヘルプカード */}
         <div className="bg-amber-50/90 rounded-3xl p-5 border border-amber-200/80 text-amber-950 space-y-2.5 shadow-xs">
           <div className="flex items-center gap-2 font-bold text-xs text-amber-900">
@@ -147,38 +148,13 @@ export default async function MePage({ params }: MePageProps) {
           )}
         </div>
 
-        {/* 回答者一覧（コメント含む） */}
-        {answerCount > 0 && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
-            <h3 className="text-sm font-bold text-slate-800">
-              回答してくれた友人たち（{answerCount}名）
-            </h3>
-            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-              {peerAnswers.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between gap-3 text-xs"
-                >
-                  <div className="space-y-1">
-                    <span className="font-bold text-slate-800">{item.peer_nickname} さん</span>
-                    {item.comment && (
-                      <div className="flex items-center gap-1.5 text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                        <MessageSquare className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-                        <span className="italic">「{item.comment}」</span>
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-[11px] text-slate-400 flex-shrink-0">
-                    {new Date(item.created_at).toLocaleDateString('ja-JP')}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <p className="text-[11px] text-slate-400 text-center pt-1">
-              ※忖度を防ぐため、個人の採点スコアは非公開です（平均値として反映されます）。
-            </p>
-          </div>
-        )}
+        {/* 回答者一覧 ＆ お返し相互診断カード */}
+        <MutualDiagnosisCard
+          sessionId={sessionId}
+          hostNickname={session.host_nickname}
+          peerAnswers={peerAnswers}
+          baseUrl={baseUrl}
+        />
       </div>
     </div>
   );
