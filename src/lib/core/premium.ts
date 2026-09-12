@@ -100,4 +100,27 @@ export function generatePremiumReport(self: TraitScores, peer: TraitScores): Pre
     rechargeRoutine = 'タスク管理から離れ、計画性のないアドリブの散歩や買い物を楽しむ。';
   }
 
-  return {\n    career: {\n      title: careerTitle,\n      superPower,\n      idealEnvironment,\n      toxicEnvironment,\n      growthAdvice,\n    },\n    romance: {\n      title: romanceTitle,\n      loveStyle,\n      hiddenTrap,\n      bestPartnerTrait,\n      secretDesire,\n    },\n    mental: {\n      title: mentalTitle,\n      stressTrigger,\n      dangerSign,\n      quickRecovery,\n      rechargeRoutine,\n    },\n  };\n}
+  return {
+    career: {
+      title: careerTitle,
+      superPower,
+      idealEnvironment,
+      toxicEnvironment,
+      growthAdvice,
+    },
+    romance: {
+      title: romanceTitle,
+      loveStyle,
+      hiddenTrap,
+      bestPartnerTrait,
+      secretDesire,
+    },
+    mental: {
+      title: mentalTitle,
+      stressTrigger,
+      dangerSign,
+      quickRecovery,
+      rechargeRoutine,
+    },
+  };
+}
