@@ -50,6 +50,8 @@ export interface FinalResult {
   primaryGap: GapPart | null;
   secondaryGap: GapPart | null;
   deltas: { trait: TraitKey; delta: number; absDelta: number }[];
+  isRare?: boolean;
+  rarityBadge?: string;
 }
 
 // セッション型
@@ -58,9 +60,9 @@ export interface SessionData {
   secret_key?: string;
   host_nickname: string;
   self_scores: TraitScores;
-  self_label: string;
-  answer_count?: number;
-  created_at: string;
+  self_label?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // 他者回答型

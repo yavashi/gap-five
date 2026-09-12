@@ -4,7 +4,8 @@ import { calculateScores } from '../core/tipi';
 import { PeerAnswerData } from '../core/types';
 import { createClient } from '../supabase/server';
 import { memoryDb } from '../store/memoryStore';
-import { isHostOfSession } from './session';
+import { isHostOfSession, getSession } from './session';
+import { calculateCompatibility } from '../core/compatibility';
 
 export async function submitPeerAnswer(
   sessionId: string,
@@ -82,6 +83,26 @@ export async function getPeerAnswers(sessionId: string) {
   return list.filter((a) => !a.is_excluded);
 }
 
+export async function getPeerAnswer(sessionId: string, answerId: string) {
+  const supabase = await createClient();
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('peer_answers')
+      .select('id, session_id, peer_nickname, peer_scores, comment, is_excluded, created_at')
+      .eq('id', answerId)
+      .eq('session_id', sessionId)
+      .single();
+
+    if (data && !error) {
+      return data as PeerAnswerData;
+    }
+  }
+
+  const list = memoryDb.peerAnswers.get(sessionId) || [];
+  return list.find((a) => a.id === answerId) || null;
+}
+
 export async function toggleExcludeAnswer(sessionId: string, answerId: string, exclude: boolean) {
   const isHost = await isHostOfSession(sessionId);
   if (!isHost) {
@@ -106,4 +127,17 @@ export async function toggleExcludeAnswer(sessionId: string, answerId: string, e
   }
 
   return { success: true };
+}
+
+export async function getCompatibilityAction(sessionId: string, answerId: string) {
+  const session = await getSession(sessionId);
+  if (!session) return null;
+  const peerAnswer = await getPeerAnswer(sessionId, answerId);
+  if (!peerAnswer) return null;
+
+  return {
+    compatibility: calculateCompatibility(session.self_scores, peerAnswer.peer_scores),
+    peerNickname: peerAnswer.peer_nickname,
+    hostNickname: session.host_nickname,
+  };
 }
