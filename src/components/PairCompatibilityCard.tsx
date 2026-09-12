@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { PairCompatibility } from '@/lib/core/compatibility';
 import { PeerSessionInfo } from '@/lib/actions/session';
-import { Users, Sparkles, Heart, ShieldAlert, MessageCircle, Lightbulb, Lock, ArrowRight, Loader2, CheckCircle2, UserCheck } from 'lucide-react';
+import { Users, Sparkles, Heart, ShieldAlert, MessageCircle, Lightbulb, Lock, ArrowRight, Loader2, CheckCircle2, UserCheck, Zap } from 'lucide-react';
 
 interface PairCompatibilityCardProps {
   sessionId: string;
@@ -212,60 +212,79 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
           </div>
         </div>
       ) : (
-        /* 未購入時のチラ見せプレビュー（1人100円で個別購入） */
-        <div className="space-y-3 text-xs">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-slate-700">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>{current.peerNickname} さんから見たあなたの魅力</span>
-            </div>
-            <p className="text-slate-500">
-              {current.peerImpression.slice(0, 24)}
-              <span className="blur-xs select-none opacity-60">...（詳細解説でアンロック）</span>
-            </p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-slate-700">
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              <span>すれ違いやすい地雷ポイント & 解決策</span>
-            </div>
-            <p className="text-slate-500">
-              {current.blindSpot.slice(0, 20)}
-              <span className="blur-xs select-none opacity-60">...（詳細解説でアンロック）</span>
-            </p>
-          </div>
-
-          {/* 対応決済手段のミニバッジ */}
-          <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-2.5 space-y-1.5">
-            <div className="flex items-center justify-between text-[10px]">
-              <span className="text-slate-700 font-bold flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-rose-500" />
-                1タップ決済・複数のお支払いに対応
+        /* 未購入時のチラ見せプレビュー（1人100円で個別購入・価値伝達型UI） */
+        <div className="space-y-3.5 text-xs">
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-500/5 via-pink-500/5 to-amber-500/5 border border-rose-100 space-y-2.5 text-left">
+            <div className="flex items-center justify-between text-xs font-bold text-rose-700">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                100円で開放される {current.peerNickname} さんとの詳細カルテ
               </span>
-              <span className="text-slate-400">カード番号入力不要</span>
+              <span className="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full text-[10px]">
+                全4項目
+              </span>
             </div>
-            <div className="grid grid-cols-4 gap-1 text-center text-[9px] font-bold">
-              <div className="py-1 px-1 rounded-md bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                🍎 Apple Pay
+
+            {/* 4大特典のプレビューリスト */}
+            <div className="space-y-2 text-slate-700">
+              <div className="flex items-start gap-2.5 bg-white p-3 rounded-xl border border-slate-100 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <strong className="block text-slate-800 text-xs font-bold">{current.peerNickname} さんから見たあなたの魅力</strong>
+                  <p className="text-slate-500 text-[11px] leading-relaxed">
+                    {current.peerImpression.slice(0, 24)}...（完全アンロック）
+                  </p>
+                </div>
               </div>
-              <div className="py-1 px-1 rounded-md bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                📱 G Pay
+
+              <div className="flex items-start gap-2.5 bg-white p-3 rounded-xl border border-slate-100 shadow-2xs">
+                <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <strong className="block text-slate-800 text-xs font-bold">2人が高め合えるシナジーポイント</strong>
+                  <p className="text-slate-500 text-[11px] leading-relaxed">
+                    {current.goodChemistry.slice(0, 24)}...（完全アンロック）
+                  </p>
+                </div>
               </div>
-              <div className="py-1 px-1 rounded-md bg-rose-50 border border-rose-200 text-rose-600 shadow-2xs">
-                🔴 PayPay
+
+              <div className="flex items-start gap-2.5 bg-white p-3 rounded-xl border border-slate-100 shadow-2xs">
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <strong className="block text-slate-800 text-xs font-bold">すれ違いやすい地雷ポイント ＆ 回避策</strong>
+                  <p className="text-slate-500 text-[11px] leading-relaxed">
+                    {current.blindSpot.slice(0, 20)}...（完全アンロック）
+                  </p>
+                </div>
               </div>
-              <div className="py-1 px-1 rounded-md bg-blue-50 border border-blue-200 text-blue-600 shadow-2xs">
-                💳 カード
+
+              {/* キラーフック：魔法の会話テーマ */}
+              <div className="flex items-start gap-2.5 bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-xl border border-amber-200/80 shadow-2xs">
+                <MessageCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <strong className="text-amber-950 text-xs font-black">2人の仲が爆速で深まる「魔法の会話テーマ」</strong>
+                    <span className="text-[9px] bg-amber-500 text-white font-bold px-1.5 py-0.2 rounded">極秘</span>
+                  </div>
+                  <p className="text-amber-800/80 text-[11px] leading-relaxed">
+                    今夜のLINEや会話ですぐ使える、2人の波長が一気に打ち解けるキラー話題（完全開放）
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* 支払いで何が起こるかの約束 */}
+          <div className="text-center text-[11px] font-bold text-rose-600 flex items-center justify-center gap-1">
+            <Zap className="w-3 h-3 text-rose-500 animate-pulse" />
+            <span>お支払い完了後、この画面のまま瞬時にカルテがアンロックされます</span>
+          </div>
+
+          {/* 購入ボタン */}
           <button
             type="button"
             onClick={handlePairCheckout}
             disabled={isLoading}
-            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-75"
+            className="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-rose-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-75"
           >
             {isLoading ? (
               <>
@@ -275,17 +294,25 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
             ) : (
               <>
                 <Lock className="w-3.5 h-3.5 text-yellow-200" />
-                <span>{current.peerNickname} さんとの詳細解説を開放する（¥100）</span>
+                <span>100円で {current.peerNickname} さんとのカルテを今すぐ見る</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
               </>
             )}
           </button>
-          <div className="space-y-1 text-center">
-            <p className="text-[11px] font-bold text-rose-600">
-              ※追加請求なし・1回限りの買い切りです（月額課金・自動更新等は一切ありません）
-            </p>
-            <p className="text-[10px] text-slate-400">
-              Face ID / Touch ID / PayPay等で1タップ決済。ご購入後はこの端末でいつでもご覧いただけます。
+
+          {/* ボタン下：安心保証とスマートな決済手段表記 */}
+          <div className="space-y-1 text-center pt-0.5">
+            <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 flex-wrap">
+              <span>🍎 Apple Pay</span>
+              <span>•</span>
+              <span>📱 Google Pay</span>
+              <span>•</span>
+              <span>🔴 PayPay</span>
+              <span>•</span>
+              <span>💳 クレカ対応</span>
+            </div>
+            <p className="text-[11px] font-bold text-slate-600">
+              ※追加請求なし・1回限りの完全買い切りです（月額課金・自動更新なし）
             </p>
           </div>
         </div>

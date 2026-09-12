@@ -465,169 +465,155 @@ export const PremiumTeaserCard: React.FC<PremiumTeaserCardProps> = ({
   }
 
   // ==========================================
-  // 未購入（チラ見せ）表示（コンパクト＆タブプレビュー）
+  // 未購入（チラ見せ）表示（全4章の目次カルテ一望 ＆ 価値伝達型UI）
   // ==========================================
   return (
     <div
       id="premium-card"
-      className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-5 sm:p-8 text-white shadow-xl space-y-4 border border-amber-500/40 relative overflow-hidden"
+      className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-5 sm:p-8 text-white shadow-xl space-y-5 border border-amber-500/40 relative overflow-hidden text-left"
     >
       <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
+      {/* ヘッダーバッジ */}
       <div className="flex items-center justify-between">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
-          <Lock className="w-3.5 h-3.5 text-amber-300" />
+          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
           <span>プレミアム限定レポート</span>
         </div>
-        <span className="text-[11px] font-bold text-amber-300/80 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+        <span className="text-xs font-black text-amber-300 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30">
           超増量版 ¥300
         </span>
       </div>
 
-      <div className="space-y-1">
-        <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400">
+      <div className="space-y-1.5">
+        <h3 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400 leading-tight">
           {hostNickname} さんの深層心理トリセツ（完全版）
         </h3>
         <p className="text-xs text-slate-300 leading-relaxed">
-          周囲の統計から導かれたあなたの才能・キャリア・恋愛・取扱説明書5箇条を網羅した大容量鑑定書です。
+          自己評価と周囲の他者評価から導き出された、あなたの才能・キャリア・恋愛・取扱説明書5箇条を完全網羅した本格鑑定書です。
         </p>
       </div>
 
-      {/* スマホ対応：チラ見せカテゴリタブ */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {categories.map((cat) => {
-          const Icon = cat.icon;
-          const isActive = activeCategory === cat.key;
-          return (
-            <button
-              key={cat.key}
-              type="button"
-              onClick={() => setActiveCategory(cat.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shrink-0 ${
-                isActive
-                  ? 'bg-amber-400 text-slate-950 shadow-sm'
-                  : 'bg-white/10 text-slate-300 hover:bg-white/15'
-              }`}
-            >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-slate-950' : 'text-slate-400'}`} />
-              <span>{cat.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 選択されたタブのチラ見せカード（1枚のみ表示でスマホ画面をすっきり維持） */}
-      <div className="text-xs">
-        {activeCategory === 'career' && (
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-blue-300">
-              <Briefcase className="w-3.5 h-3.5" />
-              <span>仕事編: {report.career.title}</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              無双できる職場: {report.career.idealEnvironment.slice(0, 24)}
-              <span className="blur-xs select-none opacity-60">...（向いている職種5選・会議立ち回り術など完全開放）</span>
-            </p>
-          </div>
-        )}
-
-        {activeCategory === 'romance' && (
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-pink-300">
-              <Heart className="w-3.5 h-3.5" />
-              <span>恋愛編: {report.romance.title}</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              無意識の地雷: {report.romance.hiddenTrap.slice(0, 20)}
-              <span className="blur-xs select-none opacity-60">...（絶対条件3箇条・最短仲直り手順など完全開放）</span>
-            </p>
-          </div>
-        )}
-
-        {activeCategory === 'manual' && (
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/20 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-amber-300">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>公式取扱説明書（周囲・パートナー用 5箇条）</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              第1条: {report.manual.rules[0]?.title}
-              <span className="blur-xs select-none opacity-60">...（第2条〜第5条を完全開放）</span>
-            </p>
-          </div>
-        )}
-
-        {activeCategory === 'mental' && (
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-purple-300">
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>メンタル処方箋: {report.mental.title}</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              限界シグナル: {report.mental.dangerSign.slice(0, 20)}
-              <span className="blur-xs select-none opacity-60">...（30分急速回復法・アファメーション開放）</span>
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* 対応決済手段の視覚的バッジ */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-3 space-y-2">
-        <div className="flex items-center justify-between text-[11px]">
-          <span className="text-amber-300 font-bold flex items-center gap-1">
-            <Zap className="w-3 h-3 text-amber-400" />
-            1タップ決済・複数のお支払いに対応
+      {/* 300円で即座にアンロックされる全4章の目次カルテ（一望化） */}
+      <div className="space-y-2.5">
+        <div className="text-xs font-bold text-amber-300 flex items-center justify-between border-b border-white/10 pb-1.5">
+          <span className="flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <span>300円でアンロックされる【全4章・完全鑑定書】</span>
           </span>
-          <span className="text-slate-400 text-[10px]">面倒なカード入力不要</span>
+          <span className="text-[10px] text-amber-300/80 font-mono">全4大領域</span>
         </div>
-        <div className="grid grid-cols-4 gap-1.5 text-center text-[10px] font-bold">
-          <div className="py-1 px-1 rounded-lg bg-black/40 border border-white/10 text-white flex items-center justify-center gap-1">
-            <span>🍎 Apple Pay</span>
+
+        {/* 第1章: キャリア */}
+        <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1.5 hover:bg-white/[0.07] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-bold text-blue-300 text-xs sm:text-sm">
+              <Briefcase className="w-4 h-4 text-blue-400 shrink-0" />
+              <span>第1章: 仕事・キャリア完全適職ガイド</span>
+            </div>
+            <span className="text-[10px] text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-400/30 whitespace-nowrap">
+              🔒 完全開放
+            </span>
           </div>
-          <div className="py-1 px-1 rounded-lg bg-black/40 border border-white/10 text-white flex items-center justify-center gap-1">
-            <span>📱 G Pay</span>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            天賦の強み「{report.career.superPower.slice(0, 20)}...」/ 無双できる職場環境 / 一瞬で病むNG環境 / 向いている職種・ポジション5選 / 面接・自己PR例文
+          </p>
+        </div>
+
+        {/* 第2章: 恋愛 */}
+        <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1.5 hover:bg-white/[0.07] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-bold text-pink-300 text-xs sm:text-sm">
+              <Heart className="w-4 h-4 text-pink-400 shrink-0" />
+              <span>第2章: 恋愛・パートナーシップの深層</span>
+            </div>
+            <span className="text-[10px] text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-400/30 whitespace-nowrap">
+              🔒 完全開放
+            </span>
           </div>
-          <div className="py-1 px-1 rounded-lg bg-rose-500/20 border border-rose-400/30 text-rose-200 flex items-center justify-center gap-1">
-            <span>🔴 PayPay</span>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            無意識の地雷「{report.romance.hiddenTrap.slice(0, 18)}...」/ 相手に求めるべき3大条件 / 喧嘩・すれ違い時の最短仲直りアプローチ / 裏の甘えたい願望
+          </p>
+        </div>
+
+        {/* 第3章: 公式取説5箇条 */}
+        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-400/25 space-y-1.5 hover:bg-amber-500/15 transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-bold text-amber-300 text-xs sm:text-sm">
+              <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>第3章: 周囲・同僚・恋人に配れる「公式取扱説明書 5箇条」</span>
+            </div>
+            <span className="text-[10px] text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-400/30 whitespace-nowrap">
+              🔒 完全開放
+            </span>
           </div>
-          <div className="py-1 px-1 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-200 flex items-center justify-center gap-1">
-            <span>💳 各種カード</span>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            第1条: {report.manual.rules[0]?.title} / 第2条〜第5条の全詳細ルールを完全収録（人間関係の摩擦が劇的に減る実用マニュアル）
+          </p>
+        </div>
+
+        {/* 第4章: メンタル処方箋 */}
+        <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1.5 hover:bg-white/[0.07] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 font-bold text-purple-300 text-xs sm:text-sm">
+              <ShieldAlert className="w-4 h-4 text-purple-400 shrink-0" />
+              <span>第4章: メンタル＆エナジー処方箋</span>
+            </div>
+            <span className="text-[10px] text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-400/30 whitespace-nowrap">
+              🔒 完全開放
+            </span>
           </div>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            ストレスの引き金 / 限界寸前の危険シグナル / 30分でHPを急速回復するルーティン / 完全孤立デーの過ごし方 / 心を守るアファメーション
+          </p>
         </div>
       </div>
 
-      {/* 購入ボタン */}
-      <button
-        type="button"
-        onClick={handleCheckout}
-        disabled={isLoading}
-        className="w-full py-3.5 sm:py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-75"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>決済画面を準備中...</span>
-          </>
-        ) : (
-          <>
-            <Unlock className="w-4 h-4" />
-            <span>300円で完全版レポートをアンロック</span>
-            <ArrowRight className="w-4 h-4 ml-1" />
-          </>
-        )}
-      </button>
+      {/* 支払いで何が起こるか（即時アンロックの約束） */}
+      <div className="pt-1">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-amber-300 font-bold pb-2 text-center">
+          <Zap className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+          <span>お支払い完了後、この画面のまま瞬時に全章がアンロックされます</span>
+        </div>
 
-      <div className="space-y-1.5 text-center">
-        <p className="text-xs font-bold text-amber-300">
+        {/* 視線が自然に吸い寄せられるHero CTAボタン */}
+        <button
+          type="button"
+          onClick={handleCheckout}
+          disabled={isLoading}
+          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-75"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>決済画面を準備中...</span>
+            </>
+          ) : (
+            <>
+              <Unlock className="w-4 h-4" />
+              <span>300円で完全版レポートを今すぐ読む</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* ボタン下：安心保証とスマートな決済手段表記 */}
+      <div className="space-y-1.5 text-center pt-1">
+        <div className="flex items-center justify-center gap-2 text-[11px] text-slate-300 flex-wrap">
+          <span className="inline-flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-md text-white font-medium">🍎 Apple Pay</span>
+          <span className="inline-flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-md text-white font-medium">📱 Google Pay</span>
+          <span className="inline-flex items-center gap-1 bg-rose-500/20 px-2 py-0.5 rounded-md text-rose-200 font-medium border border-rose-400/30">🔴 PayPay</span>
+          <span className="inline-flex items-center gap-1 bg-blue-500/20 px-2 py-0.5 rounded-md text-blue-200 font-medium border border-blue-400/30">💳 クレジットカード</span>
+        </div>
+        <p className="text-[11px] text-amber-300 font-bold">
           ※追加請求なし・1回限りの完全買い切りです（月額課金・自動更新等は一切ありません）
         </p>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          Face ID / Touch ID で認証するだけですぐ読めます。ご購入後はこのページで永久にご覧いただけます。
-        </p>
-        <p className="text-[10px] text-slate-500">
-          ※LINEアプリ内等でApple Payが出ない場合は、画面右下メニュー「Safari/Chromeで開く」を選ぶとワンタップ決済が可能です。
+        <p className="text-[10px] text-slate-400">
+          Face ID / Touch ID で認証するだけですぐ読めます。ご購入後はこのURLで永久にご覧いただけます。
         </p>
       </div>
     </div>
   );
 };
+
