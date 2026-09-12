@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PairCompatibility } from '@/lib/core/compatibility';
-import { Users, Sparkles, Heart, ShieldAlert, MessageCircle, Lightbulb, Lock, ArrowRight } from 'lucide-react';
+import { Users, Sparkles, Heart, ShieldAlert, MessageCircle, Lightbulb, Lock, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface PairCompatibilityCardProps {
   sessionId: string;
@@ -17,32 +17,73 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
   hostNickname,
 }) => {
   const searchParams = useSearchParams();
-  const isUnlockedFromUrl = searchParams?.get('premium') === 'unlocked';
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const pairUnlockedFromUrl = searchParams?.get('pairUnlocked');
+  const [unlockedMap, setUnlockedMap] = useState<Record<string, boolean>>({});
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const storageKey = `gap_five_premium_${sessionId}`;
-    if (isUnlockedFromUrl || localStorage.getItem(storageKey) === 'true') {
-      setIsUnlocked(true);
-    }
-  }, [sessionId, isUnlockedFromUrl]);
+    const newMap: Record<string, boolean> = {};
 
-  const scrollToCheckout = () => {
-    const el = document.getElementById('premium-card');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    compatibilities.forEach((c) => {
+      const storageKey = `gap_five_pair_${sessionId}_${c.peerNickname}`;
+      const isSaved = localStorage.getItem(storageKey) === 'true';
+      const isUrlMatch = pairUnlockedFromUrl === c.peerNickname;
+
+      if (isSaved || isUrlMatch) {
+        newMap[c.peerNickname] = true;
+        if (isUrlMatch) {
+          localStorage.setItem(storageKey, 'true');
+        }
+      }
+    });
+
+    setUnlockedMap(newMap);
+
+    // URLで指定された回答者のタブを自動選択
+    if (pairUnlockedFromUrl) {
+      const targetIdx = compatibilities.findIndex((c) => c.peerNickname === pairUnlockedFromUrl);
+      if (targetIdx !== -1) {
+        setSelectedIndex(targetIdx);
+      }
     }
-  };
+  }, [sessionId, compatibilities, pairUnlockedFromUrl]);
 
   if (!compatibilities || compatibilities.length === 0) {
     return null;
   }
 
   const current = compatibilities[selectedIndex] || compatibilities[0];
+  const isCurrentUnlocked = !!unlockedMap[current.peerNickname];
+
+  const handlePairCheckout = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          hostNickname,
+          itemType: 'pair',
+          peerNickname: current.peerNickname,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || '決済の開始に失敗しました');
+        setIsLoading(false);
+      }
+    } catch (e: any) {
+      alert('エラーが発生しました。もう一度お試しください。');
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-5">
+    <div id="pair-card" className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
@@ -65,24 +106,32 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
       {/* 回答者選択タブ（複数人の場合） */}
       {compatibilities.length > 1 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
-          {compatibilities.map((comp, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => setSelectedIndex(idx)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                selectedIndex === idx
-                  ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/20'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              <span>{comp.peerNickname} さんとの相性</span>
-            </button>
-          ))}
+          {compatibilities.map((comp, idx) => {
+            const isTabUnlocked = !!unlockedMap[comp.peerNickname];
+            return (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setSelectedIndex(idx)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  selectedIndex === idx
+                    ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/20'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <span>{comp.peerNickname} さんとの相性</span>
+                {isTabUnlocked ? (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                ) : (
+                  <Lock className="w-3 h-3 opacity-60" />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* 相性度スコア & 二つ名カード */}
+      {/* 【無料公開枠】相性度スコア & 二つ名・キャッチコピー */}
       <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-500/10 via-pink-500/5 to-amber-500/10 border border-rose-200/60 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-rose-700">
@@ -103,10 +152,15 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
         </div>
       </div>
 
-      {/* 詳細分析コンテンツ */}
-      {isUnlocked ? (
+      {/* 【有料・詳細分析コンテンツ（1人100円）】 */}
+      {isCurrentUnlocked ? (
         <div className="space-y-4 text-xs animate-in fade-in duration-300">
-          {/* 田中さんから見た最大の魅力 */}
+          <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px] pb-1 border-b border-slate-100">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{current.peerNickname} さんとの詳細相性カルテ（開放済み）</span>
+          </div>
+
+          {/* 相手から見た最大の魅力 */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-blue-700">
               <Sparkles className="w-3.5 h-3.5" />
@@ -154,7 +208,7 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
           </div>
         </div>
       ) : (
-        /* 未購入時のチラ見せプレビュー */
+        /* 未購入時のチラ見せプレビュー（1人100円で個別購入） */
         <div className="space-y-3 text-xs">
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-slate-700">
@@ -163,30 +217,43 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
             </div>
             <p className="text-slate-500">
               {current.peerImpression.slice(0, 24)}
-              <span className="blur-xs select-none opacity-60">...（プレミアム完全版でアンロック）</span>
+              <span className="blur-xs select-none opacity-60">...（詳細解説でアンロック）</span>
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-slate-700">
               <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              <span>2人のすれ違い地雷と解決策</span>
+              <span>すれ違いやすい地雷ポイント & 解決策</span>
             </div>
             <p className="text-slate-500">
               {current.blindSpot.slice(0, 20)}
-              <span className="blur-xs select-none opacity-60">...（プレミアム完全版でアンロック）</span>
+              <span className="blur-xs select-none opacity-60">...（詳細解説でアンロック）</span>
             </p>
           </div>
 
           <button
             type="button"
-            onClick={scrollToCheckout}
-            className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all hover:scale-[1.01] cursor-pointer"
+            onClick={handlePairCheckout}
+            disabled={isLoading}
+            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-75"
           >
-            <Lock className="w-3.5 h-3.5 text-amber-300" />
-            <span>{current.peerNickname} さんとの詳細相性カルテを開放する</span>
-            <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            {isLoading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>決済画面を準備中...</span>
+              </>
+            ) : (
+              <>
+                <Lock className="w-3.5 h-3.5 text-yellow-200" />
+                <span>{current.peerNickname} さんとの詳細解説を開放する（¥100）</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+              </>
+            )}
           </button>
+          <p className="text-[10px] text-slate-400 text-center">
+            ※{current.peerNickname} さんとの1対1詳細カルテのみを100円で買い切り閲覧できます。
+          </p>
         </div>
       )}
     </div>
