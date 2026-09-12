@@ -43,6 +43,23 @@ export default function HomePage() {
           </div>
           <div>10問・7段階評価</div>
         </div>
+
+        <footer className="pt-8 pb-4 text-center text-xs text-slate-400 space-x-3">
+          <Link href="/privacy" className="hover:text-slate-600 hover:underline">
+            プライバシーポリシー
+          </Link>
+          <span>•</span>
+          <Link href="/terms" className="hover:text-slate-600 hover:underline">
+            利用規約
+          </Link>
+          <span>•</span>
+          <Link href="/legal" className="hover:text-slate-600 hover:underline">
+            特定商取引法に基づく表記
+          </Link>
+          <p className="pt-2 text-[11px] text-slate-300">
+            © {new Date().getFullYear()} GAP-FIVE. All rights reserved.
+          </p>
+        </footer>
       </div>
     </main>
   );

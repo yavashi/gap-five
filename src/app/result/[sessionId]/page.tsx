@@ -6,10 +6,13 @@ import { getSession } from '@/lib/actions/session';
 import { getPeerAnswers } from '@/lib/actions/peer';
 import { calculateAveragePeerScores } from '@/lib/core/tipi';
 import { generateFinalResult } from '@/lib/core/gap';
+import { generatePremiumReport } from '@/lib/core/premium';
 import { RadarChart } from '@/components/RadarChart';
 import { TraitBarList } from '@/components/TraitBarList';
 import { ShareButtons } from '@/components/ShareButtons';
 import { ResultRevealModal } from '@/components/ResultRevealModal';
+import { PremiumTeaserCard } from '@/components/PremiumTeaserCard';
+import { RecommendationCard } from '@/components/RecommendationCard';
 import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -129,6 +132,9 @@ export default async function ResultPage({ params }: ResultPageProps) {
   // 確定二つ名と心理解説の生成
   const finalResult = generateFinalResult(session.self_scores, averagePeerScores);
 
+  // 深層心理トリセツ（完全版プレミアムデータ）の生成
+  const premiumReport = generatePremiumReport(session.self_scores, averagePeerScores);
+
   // コメントがある回答のみ抽出
   const comments = peerAnswers.filter((a) => a.comment && a.comment.trim().length > 0);
 
@@ -242,6 +248,13 @@ export default async function ResultPage({ params }: ResultPageProps) {
           />
         </div>
 
+        {/* 深層心理トリセツ（完全版プレミアムレポート・Stripe決済） */}
+        <PremiumTeaserCard
+          sessionId={sessionId}
+          hostNickname={session.host_nickname}
+          report={premiumReport}
+        />
+
         {/* 友人たちからの一言コメントカード群 */}
         {comments.length > 0 && (
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
@@ -285,6 +298,12 @@ export default async function ResultPage({ params }: ResultPageProps) {
           />
         </div>
 
+        {/* 性格タイプ連動おすすめサービス（アフィリエイト） */}
+        <RecommendationCard
+          selfScores={session.self_scores}
+          peerScores={averagePeerScores}
+        />
+
         {/* ホスト管理画面への復帰リンク */}
         <div className="text-center pt-1 pb-2">
           <Link
@@ -296,7 +315,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
         </div>
 
         {/* 自分も診断してみる（相互送客バイラル導線） */}
-        <div className="text-center pt-2 pb-6">
+        <div className="text-center pt-2 pb-4">
           <Link
             href="/diagnose"
             className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-base shadow-lg transition-all hover:scale-[1.01]"
@@ -305,6 +324,24 @@ export default async function ResultPage({ params }: ResultPageProps) {
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
+
+        {/* 法的情報リンク・フッター */}
+        <footer className="pt-4 pb-8 text-center text-xs text-slate-400 space-x-3">
+          <Link href="/privacy" className="hover:text-slate-600 hover:underline">
+            プライバシーポリシー
+          </Link>
+          <span>•</span>
+          <Link href="/terms" className="hover:text-slate-600 hover:underline">
+            利用規約
+          </Link>
+          <span>•</span>
+          <Link href="/legal" className="hover:text-slate-600 hover:underline">
+            特定商取引法に基づく表記
+          </Link>
+          <p className="pt-2 text-[11px] text-slate-400">
+            © {new Date().getFullYear()} GAP-FIVE. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );
