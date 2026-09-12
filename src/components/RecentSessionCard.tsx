@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { History, ArrowRight, X, Sparkles } from 'lucide-react';
+import { History, ArrowRight, X, Sparkles, Trash2 } from 'lucide-react';
+import { getSession } from '@/lib/actions/session';
 
 interface RecentSession {
   sessionId: string;
@@ -14,21 +15,40 @@ export const RecentSessionCard: React.FC = () => {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('gap_recent_session');
-      if (stored) {
+    async function checkSession() {
+      try {
+        const stored = localStorage.getItem('gap_recent_session');
+        if (!stored) return;
         const parsed = JSON.parse(stored);
-        if (parsed.sessionId && parsed.nickname) {
-          setSession(parsed);
+        if (!parsed.sessionId || !parsed.nickname) return;
+
+        // DBに存在するか検証（初期化済みの場合は自動クリア）
+        const sessionData = await getSession(parsed.sessionId);
+        if (!sessionData) {
+          localStorage.removeItem('gap_recent_session');
+          setSession(null);
+          return;
         }
+        setSession(parsed);
+      } catch {
+        localStorage.removeItem('gap_recent_session');
+        setSession(null);
       }
-    } catch {}
+    }
+    checkSession();
   }, []);
 
   if (!session || dismissed) return null;
 
   const handleDismiss = () => {
     setDismissed(true);
+  };
+
+  const handleClearHistory = () => {
+    try {
+      localStorage.removeItem('gap_recent_session');
+    } catch {}
+    setSession(null);
   };
 
   return (
@@ -71,6 +91,14 @@ export const RecentSessionCard: React.FC = () => {
         >
           <span>管理画面</span>
         </Link>
+        <button
+          type="button"
+          onClick={handleClearHistory}
+          className="inline-flex items-center justify-center p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs transition-colors"
+          title="履歴を削除して初期化"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );
