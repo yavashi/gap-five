@@ -5,6 +5,7 @@ import { getSession, isHostOfSession } from '@/lib/actions/session';
 import { getPeerAnswers } from '@/lib/actions/peer';
 import { ShareButtons } from '@/components/ShareButtons';
 import { MutualDiagnosisCard } from '@/components/MutualDiagnosisCard';
+import { SelfVisualWaitingCard } from '@/components/GapVisualCard';
 import { Sparkles, Users, Lock, Unlock, ArrowRight, ShieldCheck, MessageSquare, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -69,6 +70,12 @@ export default async function MePage({ params }: MePageProps) {
             </p>
           </div>
         </div>
+
+        {/* 自認イラストプレビューカード */}
+        <SelfVisualWaitingCard
+          hostNickname={session.host_nickname}
+          selfLabel={session.self_label}
+        />
  
         {/* URL保存・迷子防止ヘルプカード */}
         <div className="bg-amber-50/90 rounded-3xl p-5 border border-amber-200/80 text-amber-950 space-y-2.5 shadow-xs">

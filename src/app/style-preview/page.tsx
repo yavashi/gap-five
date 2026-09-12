@@ -98,6 +98,150 @@ export default function StylePreviewPage() {
         desc: '暴かれた実態：本人は締め切り23:59:59に命からがら提出して煙を吹きながら呆然としているが、スクリーンには金賞の完璧な仕事が表示され、役員たちが感涙のスタンディングオベーション。',
       },
     },
+    {
+      id: 'scalpel',
+      title: '⑤ 切れ味抜群の善意のメス（A_over）',
+      hostName: 'マサトさん',
+      self: {
+        label: '慈悲深きガーディアン',
+        img: '/gap-samples/scalpel_clean_self.jpg',
+        bubble: '「みんなの役に立ちたい…\n愛と善意で支えるわ🍲✨」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-rose-400',
+        thought: '「私は誰にでも優しく尽くす博愛主義者」',
+        desc: '本人の自認：温かいスープを差し出し、慈悲深い聖母のような笑顔で誰かを守りたい心優しきガーディアン。',
+      },
+      gap: {
+        label: '切れ味抜群の善意のメス',
+        img: '/gap-samples/scalpel_clean_gap.jpg',
+        bubble: '「正論すぎて刺さりまくる…！\n切れ味エグい…！😱🩸」',
+        bubblePos: 'bottom-14 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-rose-200 border-rose-500',
+        subBubble: '「純度100%の善意です✨（巨大メス）」',
+        witness: '周囲の証言：「相手を想っての正論だが、オブラートを省くため周囲からは切れ者として恐れられている」',
+        desc: '暴かれた実態：本人は心からの善意と慈悲のキラキラ笑顔だが、オブラートを削ぎ落とした正論のメスが巨大すぎて、周囲は失血死寸前の戦慄状態。',
+      },
+    },
+    {
+      id: 'blueprint',
+      title: '⑥ 白紙の設計図マスター（C_over）',
+      hostName: 'タクミさん',
+      self: {
+        label: '緻密なグランドデザイナー',
+        img: '/gap-samples/blueprint_clean_self.jpg',
+        bubble: '「緻密な計画こそが成功の鍵。\n全ては計算通りだ📐✨」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-blue-400',
+        thought: '「自分は抜け目なく計画を練るグランドデザイナー」',
+        desc: '本人の自認：未来的で精密な設計図の前で知的な眼鏡を光らせ、完璧なタイムラインを計算する策士。',
+      },
+      gap: {
+        label: '白紙の設計図マスター',
+        img: '/gap-samples/blueprint_clean_gap.jpg',
+        bubble: '「白紙じゃねえかーーっ！！\n全部アドリブかよ！？😱💥」',
+        bubblePos: 'bottom-16 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-cyan-200 border-cyan-500',
+        subBubble: '「頭の中にはあるから（😊）」',
+        witness: '周囲の証言：「頭の中では完璧な計画があるが、アドリブで動きすぎて周囲からは自由人に見えている」',
+        desc: '暴かれた実態：完璧な青写真を持っていると豪語していたが、広げた設計図はまさかの完全白紙（ニコちゃんマーク付）。同僚たちの阿鼻叫喚をよそに本人は涼しい顔。',
+      },
+    },
+    {
+      id: 'armor',
+      title: '⑦ ガラスの防弾チョッキ（S_over）',
+      hostName: 'リュウジさん',
+      self: {
+        label: '泰然自若のアイアンハート',
+        img: '/gap-samples/armor_clean_self.jpg',
+        bubble: '「何があっても動じない。\n我が心は鋼の鎧なり🛡️⚡️」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-amber-400',
+        thought: '「自分はタフでメンタル強靭なアイアンハート」',
+        desc: '本人の自認：頑丈なチタンの鎧に身を包み、嵐の中でも泰然と仁王立ちする不屈の騎士。',
+      },
+      gap: {
+        label: 'ガラスの防弾チョッキ',
+        img: '/gap-samples/armor_clean_gap.jpg',
+        bubble: '「お願い誰も刺激しないで…！\nヒビ入っちゃうから…！😭💦」',
+        bubblePos: 'bottom-16 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-amber-200 border-amber-500',
+        subBubble: '「胃が痛い…胃薬どこ…💊」',
+        witness: '周囲の証言：「『全然平気』と強がっているが、周囲は微小な動揺を察知して気を遣っている」',
+        desc: '暴かれた実態：重厚な鎧を着てドヤ顔しているが、胸部だけ極薄のガラス製。雨粒1滴でピキッと亀裂が入り、周囲はクッションを抱えて腫れ物を触るように過保護介護中。',
+      },
+    },
+    {
+      id: 'swan',
+      title: '⑧ 水面の白鳥（脚は激突中）（S_under）',
+      hostName: 'ハヤトさん',
+      self: {
+        label: '繊細なるクリスタルセンサー',
+        img: '/gap-samples/swan_clean_self.jpg',
+        bubble: '「心静かに瞑想中…\n私は何事にも動じない🧘‍♂️」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-purple-400',
+        thought: '「私は落ち着き払ったポーカーフェイスを保てている」',
+        desc: '本人の自認：池のほとりで静かに目を閉じ、風のそよぎにも平穏を保つ瞑想的で冷静な人物。',
+      },
+      gap: {
+        label: '水面の白鳥（脚は激突中）',
+        img: '/gap-samples/swan_clean_gap.jpg?v=2',
+        bubble: '「顔は澄ましてるけど…\n足の激漕ぎバレバレだよ！！😂💥」',
+        bubblePos: 'bottom-16 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-indigo-200 border-indigo-500',
+        subBubble: '「必死漕ぎで音速爆走中🦢💨」',
+        witness: '周囲の証言：「クールを装っているつもりらしいが、焦りと必死さが周囲には完全にダダ漏れている」',
+        desc: '暴かれた実態：本人は腕組みして悟りを開いたようにクールを装っているが、顔には冷や汗、スワンボートのペダルを音速で激漕ぎして水煙を噴き上げており、必死の焦りが周囲に丸見えで大爆笑されている。',
+      },
+    },
+    {
+      id: 'secret_base',
+      title: '⑨ 秘密基地の空想科学者（O_over）',
+      hostName: 'ヒロシさん',
+      self: {
+        label: '未踏を拓くヴィジョナリー',
+        img: '/gap-samples/secret_base_clean_self.jpg',
+        bubble: '「未来を創るヴィジョンが見える。\n世界を変えるのは私だ🚀🌌」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-indigo-400',
+        thought: '「自分は時代を先取るハイテック・ヴィジョナリー」',
+        desc: '本人の自認：サイバーパンクな夜景を見下ろし、タブレットで世界を変える新コンセプトを描く先駆者。',
+      },
+      gap: {
+        label: '秘密基地の空想科学者',
+        img: '/gap-samples/secret_base_clean_gap.jpg?v=2',
+        bubble: '「……あいつ、さっきから机の下で\nペットボトル銃構えて何と戦ってんの…？😨」',
+        bubblePos: 'bottom-16 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-emerald-200 border-emerald-500',
+        subBubble: '「最終兵器、起動まであと3分…（真顔）」',
+        witness: '周囲の証言：「頭の中は奇想天外なアイデアで溢れているが、普段は常識人の仮面を被っている」',
+        desc: '暴かれた実態：頭の中ではサイバーパンクの天才ヴィジョナリーだが、実態はオフィスの引き出しにガラクタとアルミホイルで作った「秘密兵器」を隠し持ち、真顔で世界を救う妄想をしている永遠の厨二病。',
+      },
+    },
+    {
+      id: 'innovator',
+      title: '⑩ 天然記念物級イノベーター（O_under）',
+      hostName: 'アオイさん',
+      self: {
+        label: '質実剛健のリアリズムアンカー',
+        img: '/gap-samples/innovator_clean_self.jpg',
+        bubble: '「普通が一番。私はどこにでもいる\n真面目で堅実な整備士です🌱」',
+        bubblePos: 'top-6 right-4',
+        bubbleStyle: 'bg-white text-slate-900 border-emerald-400',
+        thought: '「自分は地に足のついた堅実な常識人」',
+        desc: '本人の自認：作業場で工具を几帳面に整理し、誰よりも真面目に目の前の修理をこなす普通の職人。',
+      },
+      gap: {
+        label: '天然記念物級イノベーター',
+        img: '/gap-samples/innovator_clean_gap.jpg?v=2',
+        bubble: '「パンク修理頼んだのに…\nなんで空飛んでんのーーっ！？😱🚀」',
+        bubblePos: 'bottom-16 left-3',
+        bubbleStyle: 'bg-slate-900/95 text-amber-200 border-amber-500',
+        subBubble: '「え？普通に直しただけだけど…？🔧」',
+        witness: '周囲の証言：「本人は至って普通だと思っているが、作ったものと発想が人外レベルの異次元イノベーター」',
+        desc: '暴かれた実態：「ちょっとパンク直しただけ」と言いながら反重力ホバーバイクを爆誕させてキョトン顔。依頼主や近所の客が腰を抜かして絶叫しており、本人だけが自分の異次元さに気づいていない。',
+      },
+    },
   ];
 
   return (
@@ -112,7 +256,7 @@ export default function StylePreviewPage() {
             GAP-FIVE ギャップ対比ギャラリー
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-            自己診断（フリ）と、他者評価によって暴かれた【認知のズレ（オチ）】の対比カードです。<br />
+            自己評価（MY VIEW）と、他者評価によって見えてきた【客観的な実態（THE GAP）】の対比カードです。<br />
             イラストから不要な文字を完全排除し、Web側で日本語ふきだしをオーバーレイしています。
           </p>
         </div>
@@ -127,11 +271,11 @@ export default function StylePreviewPage() {
               </h2>
 
               <div className="grid md:grid-cols-2 gap-8 items-stretch">
-                {/* 左：自己認識（フリ） */}
+                {/* 左：自己認識（MY VIEW） */}
                 <div className="bg-slate-900 border-2 border-amber-500/40 rounded-3xl overflow-hidden flex flex-col shadow-2xl relative">
                   <div className="p-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-b border-amber-500/30 flex items-center justify-between">
                     <span className="text-xs font-extrabold uppercase tracking-widest text-amber-300">
-                      Step 1：自己診断時（フリ）
+                      Step 1：自己評価（MY VIEW）
                     </span>
                     <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 font-bold">
                       MY VIEW（本人の自認）
@@ -166,14 +310,14 @@ export default function StylePreviewPage() {
                   </div>
                 </div>
 
-                {/* 右：他者評価で暴かれたズレ（オチ） */}
+                {/* 右：他者評価で明らかになった客観視点 */}
                 <div className="bg-slate-900 border-2 border-pink-500/50 rounded-3xl overflow-hidden flex flex-col shadow-2xl relative">
                   <div className="p-4 bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-b border-pink-500/30 flex items-center justify-between">
                     <span className="text-xs font-extrabold uppercase tracking-widest text-pink-300">
-                      Step 2：他者評価集約後（オチ）
+                      Step 2：他者評価（OTHERS' VIEW）
                     </span>
                     <span className="text-xs px-2.5 py-0.5 rounded-full bg-pink-500/20 text-pink-300 font-bold animate-pulse">
-                      THE GAP（暴かれたズレ）
+                      THE GAP（周囲から見た実態）
                     </span>
                   </div>
 
