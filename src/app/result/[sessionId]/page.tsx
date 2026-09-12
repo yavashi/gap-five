@@ -7,11 +7,13 @@ import { getPeerAnswers } from '@/lib/actions/peer';
 import { calculateAveragePeerScores } from '@/lib/core/tipi';
 import { generateFinalResult } from '@/lib/core/gap';
 import { generatePremiumReport } from '@/lib/core/premium';
+import { calculatePairCompatibility } from '@/lib/core/compatibility';
 import { RadarChart } from '@/components/RadarChart';
 import { TraitBarList } from '@/components/TraitBarList';
 import { ShareButtons } from '@/components/ShareButtons';
 import { ResultRevealModal } from '@/components/ResultRevealModal';
 import { PremiumTeaserCard } from '@/components/PremiumTeaserCard';
+import { PairCompatibilityCard } from '@/components/PairCompatibilityCard';
 import { RecommendationCard } from '@/components/RecommendationCard';
 import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { headers } from 'next/headers';
@@ -134,6 +136,16 @@ export default async function ResultPage({ params }: ResultPageProps) {
 
   // 深層心理トリセツ（完全版プレミアムデータ）の生成
   const premiumReport = generatePremiumReport(session.self_scores, averagePeerScores);
+
+  // 各回答者との個別相性カルテ（1対1ケミストリー）の生成
+  const pairCompatibilities = peerAnswers.map((a) =>
+    calculatePairCompatibility(
+      session.self_scores,
+      a.peer_scores,
+      session.host_nickname,
+      a.peer_nickname
+    )
+  );
 
   // コメントがある回答のみ抽出
   const comments = peerAnswers.filter((a) => a.comment && a.comment.trim().length > 0);
@@ -282,6 +294,15 @@ export default async function ResultPage({ params }: ResultPageProps) {
               ))}
             </div>
           </div>
+        )}
+
+        {/* 回答者との個別相性カルテ（1対1ケミストリー） */}
+        {pairCompatibilities.length > 0 && (
+          <PairCompatibilityCard
+            sessionId={sessionId}
+            hostNickname={session.host_nickname}
+            compatibilities={pairCompatibilities}
+          />
         )}
 
         {/* SNSシェアエリア */}

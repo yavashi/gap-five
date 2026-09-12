@@ -6,6 +6,7 @@ import { useSearchParams, useParams } from 'next/navigation';
 import { CheckCircle2, Sparkles, ArrowRight, Home, Heart, Zap, Award, Loader2 } from 'lucide-react';
 import { getCompatibilityAction } from '@/lib/actions/peer';
 import { CompatibilityResult } from '@/lib/core/compatibility';
+import { RecommendationCard } from '@/components/RecommendationCard';
 
 function ThanksContent() {
   const searchParams = useSearchParams();
@@ -119,6 +120,9 @@ function ThanksContent() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+
+        {/* おすすめサービス・書籍レコメンドカード */}
+        <RecommendationCard variant="thanks" />
 
         <div className="pt-1">
           <Link
