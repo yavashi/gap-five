@@ -9,6 +9,7 @@ import { generateFinalResult } from '@/lib/core/gap';
 import { RadarChart } from '@/components/RadarChart';
 import { TraitBarList } from '@/components/TraitBarList';
 import { ShareButtons } from '@/components/ShareButtons';
+import { ResultRevealModal } from '@/components/ResultRevealModal';
 import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -153,6 +154,18 @@ export default async function ResultPage({ params }: ResultPageProps) {
             </span>
           )}
         </div>
+
+        {/* 結果発表ドラマチック演出モーダル & 再生ボタン */}
+        <ResultRevealModal
+          sessionId={sessionId}
+          hostNickname={session.host_nickname}
+          finalTitle={finalResult.title}
+          selfLabel={finalResult.selfLabel}
+          peerRealityLabel={finalResult.primaryGap ? finalResult.primaryGap.name : 'そのまま（等身大）'}
+          isRare={finalResult.isRare}
+          rarityBadge={finalResult.rarityBadge}
+          answerCount={answerCount}
+        />
 
         {/* 確定称号メインカード */}
         <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-4 relative overflow-hidden">
