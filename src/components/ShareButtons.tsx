@@ -32,15 +32,26 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
       const fileName = `gap-five-${hostNickname}.png`;
       const file = new File([blob], fileName, { type: 'image/png' });
 
+      let shared = false;
       // iOS Safari / Android Chrome での写真保存・共有シート
       if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: `${hostNickname}さんの性格ギャップ診断結果`,
-          text: `私の診断結果は【${resultTitle || ''}】でした！ #GAPFIVE`,
-        });
-      } else {
-        // PC・非対応ブラウザでのダウンロード
+        try {
+          await navigator.share({
+            files: [file],
+            title: `${hostNickname}さんの性格ギャップ診断結果`,
+            text: `私の診断結果は【${resultTitle || ''}】でした！ #GAPFIVE`,
+          });
+          shared = true;
+        } catch (shareErr: any) {
+          if (shareErr.name === 'AbortError') {
+            return;
+          }
+          console.warn('Web Share API failed, falling back to direct download:', shareErr);
+        }
+      }
+
+      if (!shared) {
+        // PC・非対応ブラウザ・共有失敗時のダウンロード
         const objectUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = objectUrl;
