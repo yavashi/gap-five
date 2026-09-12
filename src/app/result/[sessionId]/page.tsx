@@ -15,6 +15,7 @@ import { ResultRevealModal } from '@/components/ResultRevealModal';
 import { PremiumTeaserCard } from '@/components/PremiumTeaserCard';
 import { PairCompatibilityCard } from '@/components/PairCompatibilityCard';
 import { RecommendationCard } from '@/components/RecommendationCard';
+import { GapVisualCard } from '@/components/GapVisualCard';
 import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -234,6 +235,15 @@ export default async function ResultPage({ params }: ResultPageProps) {
             </div>
           </div>
         </div>
+
+        {/* 暴かれたズレの対比ビジュアルカード（自認 vs 実態） */}
+        <GapVisualCard
+          hostNickname={session.host_nickname}
+          selfLabel={finalResult.selfLabel}
+          gapName={finalResult.primaryGap ? finalResult.primaryGap.name : '等身大パーソン'}
+          gapTrait={finalResult.primaryGap?.trait}
+          gapType={finalResult.primaryGap?.type}
+        />
 
         {/* 重ね合わせレーダーチャート */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
