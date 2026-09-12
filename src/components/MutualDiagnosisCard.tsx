@@ -42,7 +42,7 @@ export const MutualDiagnosisCard: React.FC<MutualDiagnosisCardProps> = ({
 
   const handleCopyReverseInvite = async (peerName: string) => {
     const reverseUrl = `${baseUrl}/diagnose?fromSession=${sessionId}&name=${encodeURIComponent(peerName)}&returnToHost=${encodeURIComponent(hostNickname)}`;
-    const text = `【${peerName}さんへ】\n${hostNickname}です！私の性格診断に回答してくれてありがとう！\n次は私が${peerName}さんの性格を診断したいので、下のリンクから1分で自己診断を作ってみてね！\n${reverseUrl}`;
+    const text = `【${peerName}さんへ】\n${hostNickname}です！私の性格診断に回答してくれてありがとう！\n次は私が${peerName}さんの性格を診断したいので、自己診断を作ってみてね（登録などはなく2分くらいで終わる簡単なものです。月額課金等もありません）！\n${reverseUrl}`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -122,7 +122,7 @@ export const MutualDiagnosisCard: React.FC<MutualDiagnosisCardProps> = ({
           <div className="space-y-3">
             {peerAnswers.map((item) => {
               const reverseInviteUrl = `${baseUrl}/diagnose?fromSession=${sessionId}&name=${encodeURIComponent(item.peer_nickname)}&returnToHost=${encodeURIComponent(hostNickname)}`;
-              const lineInviteText = `【${item.peer_nickname}さんへ】\n${hostNickname}です！私の性格診断に回答してくれてありがとう！\n次は私が${item.peer_nickname}さんの性格を診断したいので、下のリンクから1分で自己診断を作ってみてね！\n${reverseInviteUrl}`;
+              const lineInviteText = `【${item.peer_nickname}さんへ】\n${hostNickname}です！私の性格診断に回答してくれてありがとう！\n次は私が${item.peer_nickname}さんの性格を診断したいので、自己診断を作ってみてね（登録などはなく2分くらいで終わる簡単なものです。月額課金等もありません）！\n${reverseInviteUrl}`;
               const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineInviteText)}`;
               const isCopied = copiedName === item.peer_nickname;
 
