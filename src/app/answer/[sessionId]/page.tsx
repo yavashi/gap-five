@@ -2,7 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Heart } from 'lucide-react';
 import { getSession, isHostOfSession } from '@/lib/actions/session';
 import { AnswerForm } from '@/components/AnswerForm';
 
@@ -98,6 +98,17 @@ export default async function AnswerPage({ params, searchParams }: AnswerPagePro
               確定結果を見る
             </Link>
           </div>
+        </div>
+
+        {/* 回答者へのメリット＆安心感バナー */}
+        <div className="bg-gradient-to-r from-rose-500/10 via-purple-500/10 to-indigo-500/10 rounded-2xl p-4 border border-rose-200/80 space-y-1.5 shadow-2xs">
+          <div className="flex items-center gap-1.5 font-bold text-xs text-rose-800">
+            <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500 flex-shrink-0" />
+            <span>回答後に {effectiveHostName} さんとの相性診断がすぐ見られます！</span>
+          </div>
+          <p className="text-[11px] text-slate-600 leading-relaxed">
+            登録不要・2分で終わる簡単なアンケートです（完全匿名集計のため個別の点数は相手にも非公開です）。回答が完了すると、あなたと{effectiveHostName}さんの「波長シンクロ度」や相性アドバイスがその場でアンロックされます！
+          </p>
         </div>
 
         <AnswerForm session={session} customHostName={effectiveHostName} />
