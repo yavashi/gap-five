@@ -43,7 +43,7 @@ export default async function MePage({ params }: MePageProps) {
               ホスト管理画面
             </span>
             <span className="text-xs text-blue-100">
-              {new Date(session.created_at).toLocaleDateString('ja-JP')}
+              {new Date(session.created_at || Date.now()).toLocaleDateString('ja-JP')}
             </span>
           </div>
 
@@ -68,7 +68,7 @@ export default async function MePage({ params }: MePageProps) {
             </p>
           </div>
         </div>
- 
+
         {/* URL保存・迷子防止ヘルプカード */}
         <div className="bg-amber-50/90 rounded-3xl p-5 border border-amber-200/80 text-amber-950 space-y-2.5 shadow-xs">
           <div className="flex items-center gap-2 font-bold text-xs text-amber-900">
