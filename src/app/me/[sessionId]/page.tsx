@@ -112,7 +112,12 @@ export default async function MePage({ params }: MePageProps) {
             </p>
           </div>
 
-          <ShareButtons shareUrl={shareUrl} hostNickname={session.host_nickname} />
+          <ShareButtons
+            shareUrl={shareUrl}
+            hostNickname={session.host_nickname}
+            sessionId={sessionId}
+            selfLabel={session.self_label}
+          />
         </div>
 
         {/* 結果確認ステータスカード */}

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, Share2, Download, Loader2 } from 'lucide-react';
+import { Copy, Check, Share2, Download, Loader2, MessageSquare, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { SELF_VISUAL_MAP } from './GapVisualCard';
 
 interface ShareButtonsProps {
   shareUrl: string;
@@ -9,6 +10,7 @@ interface ShareButtonsProps {
   isResult?: boolean;
   resultTitle?: string;
   sessionId?: string;
+  selfLabel?: string;
 }
 
 export const ShareButtons: React.FC<ShareButtonsProps> = ({
@@ -17,9 +19,12 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
   isResult = false,
   resultTitle,
   sessionId,
+  selfLabel,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [copiedMsg, setCopiedMsg] = useState(false);
   const [isSavingImage, setIsSavingImage] = useState(false);
+  const [isSavingSelfImage, setIsSavingSelfImage] = useState(false);
 
   const handleSaveImage = async () => {
     if (!sessionId) return;
@@ -70,6 +75,52 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
     }
   };
 
+  // 自認イラストデータの取得
+  const selfData = selfLabel ? (SELF_VISUAL_MAP[selfLabel] || SELF_VISUAL_MAP['変幻自在のバランサー']) : null;
+
+  const handleSaveSelfImage = async () => {
+    if (!selfData) return;
+    setIsSavingSelfImage(true);
+    try {
+      const res = await fetch(selfData.img);
+      if (!res.ok) throw new Error('画像の取得に失敗しました');
+      const blob = await res.blob();
+      const fileName = `gap-five-self-${effectiveName}.jpg`;
+      const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+      let shared = false;
+      if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `${effectiveName}の自認診断`,
+            text: `私の自称ラベルは「${selfLabel}」でした！私の印象を教えてね！ #GAPFIVE`,
+          });
+          shared = true;
+        } catch (shareErr: any) {
+          if (shareErr.name === 'AbortError') return;
+        }
+      }
+
+      if (!shared) {
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
+      }
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        alert('画像の保存に失敗しました。画像長押しまたは右クリックで保存してください。');
+      }
+    } finally {
+      setIsSavingSelfImage(false);
+    }
+  };
+
   // 相手別ニックネーム使い分けステート
   const [customAlias, setCustomAlias] = useState('');
   const [showAliasInput, setShowAliasInput] = useState(false);
@@ -97,11 +148,43 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
     }
   };
 
-  // メッセージの作成（誠実で安心感があり、メリットが伝わる表現）
-  const inviteText = `【${effectiveName}の性格診断のお願い】\n周りから見た私の印象を教えてもらえると嬉しいです！\n\n登録などは一切なく、すぐ始められて2分くらいで終わる簡単なアンケートです（月額課金などのサービスもありません）。\n\n回答が終わると、私とあなたとの相性診断やコミュニケーションのヒントもすぐに見られます！\n${currentShareUrl}`;
+  // メッセージの作成（自認ラベルと解説を盛り込んだ親しみやすく回答しやすい例文）
+  const inviteText = selfLabel
+    ? `【${effectiveName}の性格診断のお願い🙏】\n` +
+      `自分と周りの印象の「ギャップ」を調べる性格診断をやってみたよ！\n` +
+      `私の自称ラベルは『${selfLabel}』でした✨\n` +
+      (selfData ? `（自認：「${selfData.desc}」）\n\n` : '\n') +
+      `でも、みんなから見たら本当はどう見えてる…？\n` +
+      `1分（10問）で終わるから、直感で採点してみてほしい！\n` +
+      `※会員登録なし・完全匿名集計です\n\n` +
+      `👇回答はこちらから（私との相性診断もすぐ見られます）\n` +
+      `${currentShareUrl}`
+    : `【${effectiveName}の性格診断のお願い🙏】\n` +
+      `周りから見た私の印象を教えてもらえると嬉しいです！\n\n` +
+      `登録などは一切なく、すぐ始められて1〜2分で終わる簡単なアンケートです（完全匿名）。\n\n` +
+      `回答が終わると、私とあなたとの相性診断もすぐに見られます！\n` +
+      `${currentShareUrl}`;
+
   const resultText = isResult
     ? `【自称と実態のギャップ診断】\n私の診断結果は「${resultTitle || ''}」でした！\nみんなの目から見た私はどう見えてる？\n${currentShareUrl} #GAPFIVE`
     : inviteText;
+
+  const handleCopyMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(resultText);
+      setCopiedMsg(true);
+      setTimeout(() => setCopiedMsg(false), 2500);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = resultText;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopiedMsg(true);
+      setTimeout(() => setCopiedMsg(false), 2500);
+    }
+  };
 
   // LINE共有URL
   const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(resultText)}`;
@@ -174,6 +257,41 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         </div>
       )}
 
+      {/* メッセージ例文プレビュー＆コピーカード */}
+      <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/70 border border-blue-200/80 rounded-2xl p-3.5 space-y-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
+            <span>LINE送信用メッセージ（例文）</span>
+          </span>
+          <button
+            type="button"
+            onClick={handleCopyMessage}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-xs transition-all active:scale-95"
+          >
+            {copiedMsg ? (
+              <>
+                <Check className="w-3 h-3 text-white" />
+                <span>コピー完了！</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3" />
+                <span>全文コピー</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="p-3 bg-white rounded-xl border border-blue-100 text-xs text-slate-700 font-sans leading-relaxed whitespace-pre-line select-all max-h-36 overflow-y-auto">
+          {resultText}
+        </div>
+
+        <p className="text-[10px] text-slate-500 leading-tight">
+          💡「LINEで送る」ボタンを押しても入力欄が空欄だった場合は、上の<strong>「全文コピー」</strong>を押してLINEのトーク画面に貼り付けてください。
+        </p>
+      </div>
+
       <div className="flex items-center gap-2 bg-slate-100 p-2 rounded-xl border border-slate-200">
         <input
           type="text"
@@ -219,6 +337,34 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         </a>
       </div>
 
+      {/* 自己診断直後：自認イラストの保存＆送信ボタン */}
+      {!isResult && selfData && (
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={handleSaveSelfImage}
+            disabled={isSavingSelfImage}
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-75 cursor-pointer"
+          >
+            {isSavingSelfImage ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>画像を準備中...</span>
+              </>
+            ) : (
+              <>
+                <ImageIcon className="w-4 h-4" />
+                <span>自認イラスト画像を保存（LINEに一緒に送ると効果的！）</span>
+              </>
+            )}
+          </button>
+          <p className="text-[10px] text-slate-400 text-center mt-1">
+            ※画像を保存してLINEトークにメッセージと一緒に送ると、友人が興味を持ってすぐ回答してくれます。
+          </p>
+        </div>
+      )}
+
+      {/* 結果確定後：結果カード保存ボタン */}
       {isResult && sessionId && (
         <button
           type="button"
