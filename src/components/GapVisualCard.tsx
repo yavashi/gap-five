@@ -49,6 +49,16 @@ const GAP_VISUAL_MAP: Record<string, GapVisualData> = {
     selfThought: '「私は損得勘定とロジックで動く冷徹な合理主義者」',
     gapReality: '雨の中、捨て猫に傘を差し出し、泣いてる後輩に肉まんとホット缶を渡しつつ、顔だけは頑なに「フン！」とそっぽを向いている。',
   },
+  // C_under: 崖っぷちの神業アクロバット
+  '崖っぷちの神業アクロバット': {
+    selfImg: '/gap-samples/acrobat_clean_self.jpg',
+    gapImg: '/gap-samples/acrobat_clean_gap.jpg',
+    selfBubble: '「計画なんて縛られたくない。\n直感とアドリブが俺の流儀🎸」',
+    gapBubble: '「奇跡の神プレゼンだ…！\n全米が泣いた完璧な仕事…！😭👏」',
+    gapSubBubble: '「えっ…通っちゃった…？（白目）」',
+    selfThought: '「自分はいつも行き当たりばったりの自由人」',
+    gapReality: '本人の体感はいつも泥縄のパニックだが、締め切り23:59:59に提出した土壇場の帳尻合わせが完璧すぎて、役員たちが感涙のスタンディングオベーション。',
+  },
 };
 
 export const GapVisualCard: React.FC<GapVisualCardProps> = ({
