@@ -71,28 +71,26 @@ export default async function AnswerPage({ params, searchParams }: AnswerPagePro
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6">
       <div className="max-w-xl mx-auto space-y-4">
-        {/* ホスト本人向け案内バナー */}
-        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 rounded-2xl p-4 border border-amber-200 text-amber-950 space-y-2 shadow-xs">
-          <div className="flex items-center gap-1.5 font-bold text-xs text-amber-900">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-            <span>
-              {isHost
-                ? '【作成者ご本人】こちらのページを開いています'
-                : `あなたが「${effectiveHostName}」さんご本人ですか？`}
-            </span>
+        {/* ホスト本人（Cookie認証済）の場合のみ案内バナーを表示 */}
+        {isHost && (
+          <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 rounded-2xl p-4 border border-amber-200 text-amber-950 space-y-2 shadow-xs">
+            <div className="flex items-center gap-1.5 font-bold text-xs text-amber-900">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+              <span>【作成者ご本人】こちらのページを開いています</span>
+            </div>
+            <p className="text-[11px] text-amber-800 leading-relaxed">
+              友達に送ったリンクをご自身で開いた場合は、こちらから回答状況や確定結果を確認できます。
+            </p>
+            <div className="pt-1">
+              <Link
+                href={`/result/${sessionId}`}
+                className="w-full inline-flex items-center justify-center gap-1.5 text-center py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs shadow-xs transition-colors"
+              >
+                <span>あなたの診断ページを開く（回答状況・結果） →</span>
+              </Link>
+            </div>
           </div>
-          <p className="text-[11px] text-amber-800 leading-relaxed">
-            友達に送ったリンクをご自身で開いた場合は、こちらから回答状況や確定結果を確認できます。
-          </p>
-          <div className="pt-1">
-            <Link
-              href={`/result/${sessionId}`}
-              className="w-full inline-flex items-center justify-center gap-1.5 text-center py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs shadow-xs transition-colors"
-            >
-              <span>あなたの診断ページを開く（回答状況・結果） →</span>
-            </Link>
-          </div>
-        </div>
+        )}
 
         {/* 回答者へのメリット＆安心感バナー */}
         <div className="bg-gradient-to-r from-rose-500/10 via-purple-500/10 to-indigo-500/10 rounded-2xl p-4 border border-rose-200/80 space-y-1.5 shadow-2xs">

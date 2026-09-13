@@ -107,31 +107,56 @@ export const PairCompatibilityCard: React.FC<PairCompatibilityCardProps> = ({
         </span>
       </div>
 
-      {/* 回答者選択タブ（複数人の場合） */}
+      {/* 回答者選択セレクター（複数人の場合：一目でわかるカード型グリッド） */}
       {compatibilities.length > 1 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
-          {compatibilities.map((comp, idx) => {
-            const isTabUnlocked = !!unlockedMap[comp.peerNickname];
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setSelectedIndex(idx)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                  selectedIndex === idx
-                    ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/20'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <span>{comp.peerNickname} さんとの相性</span>
-                {isTabUnlocked ? (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                ) : (
-                  <Lock className="w-3 h-3 opacity-60" />
-                )}
-              </button>
-            );
-          })}
+        <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-100/80 space-y-2.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-slate-800 flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-rose-500" />
+              <span>カルテを見る相手を選ぶ（タップで切替・全{compatibilities.length}名）</span>
+            </span>
+            <span className="text-[11px] text-slate-500">
+              現在：<strong className="text-rose-600 font-bold">{current.peerNickname}さん</strong>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {compatibilities.map((comp, idx) => {
+              const isSelected = selectedIndex === idx;
+              const isTabUnlocked = !!unlockedMap[comp.peerNickname];
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedIndex(idx)}
+                  className={`p-2.5 rounded-xl text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 relative border ${
+                    isSelected
+                      ? 'bg-white border-rose-400 shadow-md ring-2 ring-rose-400/40'
+                      : 'bg-white/70 hover:bg-white border-slate-200/80 hover:border-slate-300 shadow-2xs'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className={`text-xs font-black truncate ${isSelected ? 'text-rose-700' : 'text-slate-800'}`}>
+                      {comp.peerNickname}
+                    </span>
+                    {isSelected ? (
+                      <span className="shrink-0 w-2 h-2 rounded-full bg-rose-500" />
+                    ) : isTabUnlocked ? (
+                      <span className="shrink-0 text-[10px] text-emerald-600 font-bold">解放済</span>
+                    ) : (
+                      <Lock className="w-3 h-3 text-slate-400 shrink-0" />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] pt-0.5 border-t border-slate-100">
+                    <span className="text-slate-400 text-[10px]">シンクロ度</span>
+                    <span className={`font-black ${isSelected ? 'text-rose-600' : 'text-slate-700'}`}>
+                      {comp.score}%
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

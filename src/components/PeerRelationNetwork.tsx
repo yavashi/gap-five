@@ -13,7 +13,9 @@ import {
   Send, 
   Check, 
   Copy, 
-  Heart 
+  Heart,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 export interface PeerRelationItem {
@@ -41,6 +43,7 @@ export const PeerRelationNetwork: React.FC<PeerRelationNetworkProps> = ({
   isHostView = false,
 }) => {
   const [copiedName, setCopiedName] = useState<string | null>(null);
+  const [isOpenAll, setIsOpenAll] = useState(false);
 
   if (!peerAnswers || peerAnswers.length === 0) {
     return null;
@@ -54,6 +57,8 @@ export const PeerRelationNetwork: React.FC<PeerRelationNetworkProps> = ({
     }
   });
   const uniquePeers = Array.from(uniquePeersMap.values());
+  const displayedPeers = isOpenAll || uniquePeers.length <= 2 ? uniquePeers : uniquePeers.slice(0, 2);
+  const hiddenCount = uniquePeers.length - 2;
 
   // 相互関係の内訳カウント
   let mutualCount = 0; // 相互評価成立
@@ -139,7 +144,7 @@ export const PeerRelationNetwork: React.FC<PeerRelationNetworkProps> = ({
 
       {/* 各回答者との関係リスト */}
       <div className="space-y-3 pt-1">
-        {uniquePeers.map((item) => {
+        {displayedPeers.map((item) => {
           const peerName = item.peer_nickname;
           const info = peerSessionMap[peerName];
           const hasCreatedSession = !!info?.sessionId;
@@ -344,6 +349,27 @@ export const PeerRelationNetwork: React.FC<PeerRelationNetworkProps> = ({
           );
         })}
       </div>
+
+      {/* 3名以上の時の折り畳み / 展開ボタン */}
+      {uniquePeers.length > 2 && (
+        <button
+          type="button"
+          onClick={() => setIsOpenAll(!isOpenAll)}
+          className="w-full py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+        >
+          {isOpenAll ? (
+            <>
+              <ChevronUp className="w-4 h-4" />
+              <span>関係マップを折りたたむ（主要2名のみ表示）</span>
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4" />
+              <span>全 {uniquePeers.length} 名の関係をすべて見る（残り {hiddenCount} 名を展開）</span>
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 };

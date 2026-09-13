@@ -359,8 +359,8 @@ export default async function ResultPage({ params }: ResultPageProps) {
 
         {/* 3大スマートタブコンテナ */}
         <ResultTabContainer
-          commentsCount={comments.length}
-          pairCount={pairCompatibilities.length}
+          commentsCount={isHost ? comments.length : 0}
+          pairCount={isHost ? pairCompatibilities.length : 0}
           gapContent={
             <>
               {/* 結果発表ドラマチック演出モーダル & 再生ボタン */}
@@ -511,78 +511,112 @@ export default async function ResultPage({ params }: ResultPageProps) {
             </>
           }
           friendsContent={
-            <>
-              {/* 評価・相互診断の関係相関マップ */}
-              {answerCount > 0 && (
-                <PeerRelationNetwork
-                  sessionId={sessionId}
-                  hostNickname={session.host_nickname}
-                  peerAnswers={peerAnswers}
-                  peerSessionMap={peerSessionMap}
-                  baseUrl={baseUrl}
-                  isHostView={isHost}
-                />
-              )}
+            isHost ? (
+              <>
+                {/* 評価・相互診断の関係相関マップ */}
+                {answerCount > 0 && (
+                  <PeerRelationNetwork
+                    sessionId={sessionId}
+                    hostNickname={session.host_nickname}
+                    peerAnswers={peerAnswers}
+                    peerSessionMap={peerSessionMap}
+                    baseUrl={baseUrl}
+                    isHostView={isHost}
+                  />
+                )}
 
-              {/* 友人たちからの一言コメントカード群 */}
-              {comments.length > 0 ? (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5 text-indigo-600" />
-                      <span>友人たちからの生の声</span>
-                    </h2>
-                    <span className="text-xs text-slate-400">{comments.length}件のメッセージ</span>
-                  </div>
+                {/* 友人たちからの一言コメントカード群 */}
+                {comments.length > 0 ? (
+                  <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-indigo-600" />
+                        <span>友人たちからの生の声</span>
+                      </h2>
+                      <span className="text-xs text-slate-400">{comments.length}件のメッセージ</span>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    {comments.map((item) => {
-                      const peerSession = peerSessionMap[item.peer_nickname];
-                      return (
-                        <div
-                          key={item.id}
-                          className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 shadow-xs space-y-2 flex flex-col justify-between"
-                        >
-                          <p className="text-xs font-medium text-slate-800 leading-relaxed italic">
-                            「{item.comment}」
-                          </p>
-                          <div className="flex items-center justify-between pt-1 border-t border-amber-200/40">
-                            <div className="text-[11px] font-bold text-amber-900">
-                              — {item.peer_nickname} さん
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      {comments.map((item) => {
+                        const peerSession = peerSessionMap[item.peer_nickname];
+                        return (
+                          <div
+                            key={item.id}
+                            className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/60 shadow-xs space-y-2 flex flex-col justify-between"
+                          >
+                            <p className="text-xs font-medium text-slate-800 leading-relaxed italic">
+                              「{item.comment}」
+                            </p>
+                            <div className="flex items-center justify-between pt-1 border-t border-amber-200/40">
+                              <div className="text-[11px] font-bold text-amber-900">
+                                — {item.peer_nickname} さん
+                              </div>
+                              {peerSession?.sessionId && (
+                                <Link
+                                  href={peerSession.hasAnswered ? `/result/${peerSession.sessionId}` : `/answer/${peerSession.sessionId}`}
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-700 hover:text-indigo-900 bg-white/80 hover:bg-white px-2 py-0.5 rounded-md border border-indigo-200/60 shadow-2xs transition-colors"
+                                >
+                                  <span>{peerSession.hasAnswered ? '診断結果を見る' : '逆評価する'}</span>
+                                  <ArrowRight className="w-2.5 h-2.5" />
+                                </Link>
+                              )}
                             </div>
-                            {peerSession?.sessionId && (
-                              <Link
-                                href={peerSession.hasAnswered ? `/result/${peerSession.sessionId}` : `/answer/${peerSession.sessionId}`}
-                                className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-700 hover:text-indigo-900 bg-white/80 hover:bg-white px-2 py-0.5 rounded-md border border-indigo-200/60 shadow-2xs transition-colors"
-                              >
-                                <span>{peerSession.hasAnswered ? '診断結果を見る' : '逆評価する'}</span>
-                                <ArrowRight className="w-2.5 h-2.5" />
-                              </Link>
-                            )}
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-3xl p-8 text-center space-y-2 border border-slate-200/80">
-                  <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
-                  <p className="text-sm font-bold text-slate-700">まだメッセージはありません</p>
-                  <p className="text-xs text-slate-400">友人が回答時にコメントを入力するとここに表示されます。</p>
-                </div>
-              )}
+                ) : (
+                  <div className="bg-white rounded-3xl p-8 text-center space-y-2 border border-slate-200/80">
+                    <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
+                    <p className="text-sm font-bold text-slate-700">まだメッセージはありません</p>
+                    <p className="text-xs text-slate-400">友人が回答時にコメントを入力するとここに表示されます。</p>
+                  </div>
+                )}
 
-              {/* 回答者との個別相性カルテ（1対1ケミストリー & 相互診断リンク） */}
-              {pairCompatibilities.length > 0 && (
-                <PairCompatibilityCard
-                  sessionId={sessionId}
-                  hostNickname={session.host_nickname}
-                  compatibilities={pairCompatibilities}
-                  peerSessionMap={peerSessionMap}
-                />
-              )}
-            </>
+                {/* 回答者との個別相性カルテ（1対1ケミストリー & 相互診断リンク） */}
+                {pairCompatibilities.length > 0 && (
+                  <PairCompatibilityCard
+                    sessionId={sessionId}
+                    hostNickname={session.host_nickname}
+                    compatibilities={pairCompatibilities}
+                    peerSessionMap={peerSessionMap}
+                  />
+                )}
+              </>
+            ) : (
+              /* 第三者・友人閲覧時のプライバシー保護画面 */
+              <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-5 text-center">
+                <div className="w-14 h-14 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mx-auto">
+                  <Lock className="w-6 h-6 text-slate-500" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                    回答者との詳細関係・相性カルテは非公開です
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-md mx-auto">
+                    プライバシー保護のため、回答者ごとの個別コメントや相性カルテ、関係相関マップは作成者ご本人（{session.host_nickname} さん）のみに安全に限定公開されています。
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 space-y-3 max-w-md mx-auto text-left">
+                  <div className="flex items-center gap-2 text-indigo-900 font-bold text-xs">
+                    <Sparkles className="w-4 h-4 text-indigo-600" />
+                    <span>あなたも自分のギャップを診断してみませんか？</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    1分であなたの「自称」と「友達から見えた実態」のギャップを暴く性格診断を作成できます。
+                  </p>
+                  <Link
+                    href="/diagnose"
+                    className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-sm transition-all"
+                  >
+                    <span>自分のギャップ診断をつくる（無料・1分）</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            )
           }
         />
 
