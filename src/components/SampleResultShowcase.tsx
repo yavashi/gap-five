@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { RadarChart } from './RadarChart';
 import { Sparkles, Users, ArrowRight, Heart } from 'lucide-react';
 import Link from 'next/link';
@@ -141,13 +141,18 @@ export const SampleResultShowcase: React.FC = () => {
         <p className="text-xs text-slate-500">
           あなたと友達の間にはどんなギャップが潜んでいるでしょうか？
         </p>
-        <Link
-          href="/style-preview"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline"
-        >
-          <span>他のキャラクター見本（全10タイプ）を見る</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+        <div className="pt-1">
+          <Link
+            href="/diagnose"
+            className="inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md transition-all hover:scale-[1.01]"
+          >
+            <span>あなたの二つ名を暴いてみる（無料・1分）</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <p className="text-[10px] text-slate-400">
+          ※他の二つ名やイラストは、診断後のお楽しみです🎁
+        </p>
       </div>
     </div>
   );
