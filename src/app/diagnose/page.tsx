@@ -107,7 +107,7 @@ function DiagnoseContent() {
               );
             }
           } catch {}
-          router.push(`/me/${result.sessionId}`);
+          router.push(`/result/${result.sessionId}`);
         }
       } catch (err: any) {
         setError(err.message || '診断の作成に失敗しました。もう一度お試しください。');

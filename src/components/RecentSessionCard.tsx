@@ -82,14 +82,8 @@ export const RecentSessionCard: React.FC = () => {
           href={`/result/${session.sessionId}`}
           className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-sm transition-all hover:scale-[1.01]"
         >
-          <span>確定結果を見る</span>
+          <span>あなたの診断ページを開く</span>
           <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
-        <Link
-          href={`/me/${session.sessionId}`}
-          className="inline-flex items-center justify-center py-2.5 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
-        >
-          <span>管理画面</span>
         </Link>
         <button
           type="button"

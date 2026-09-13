@@ -84,18 +84,12 @@ export default async function AnswerPage({ params, searchParams }: AnswerPagePro
           <p className="text-[11px] text-amber-800 leading-relaxed">
             友達に送ったリンクをご自身で開いた場合は、こちらから回答状況や確定結果を確認できます。
           </p>
-          <div className="flex gap-2 pt-1">
-            <Link
-              href={`/me/${sessionId}`}
-              className="flex-1 text-center py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-colors"
-            >
-              管理画面（回答状況）へ
-            </Link>
+          <div className="pt-1">
             <Link
               href={`/result/${sessionId}`}
-              className="flex-1 text-center py-2 px-3 rounded-xl bg-white hover:bg-amber-50 text-amber-900 border border-amber-300 font-bold text-xs transition-colors"
+              className="w-full inline-flex items-center justify-center gap-1.5 text-center py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold text-xs shadow-xs transition-colors"
             >
-              確定結果を見る
+              <span>あなたの診断ページを開く（回答状況・結果） →</span>
             </Link>
           </div>
         </div>
