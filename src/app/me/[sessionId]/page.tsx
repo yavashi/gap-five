@@ -6,6 +6,7 @@ import { getPeerAnswers } from '@/lib/actions/peer';
 import { ShareButtons } from '@/components/ShareButtons';
 import { MutualDiagnosisCard } from '@/components/MutualDiagnosisCard';
 import { SelfVisualWaitingCard } from '@/components/GapVisualCard';
+import { PeerRelationNetwork } from '@/components/PeerRelationNetwork';
 import { Sparkles, Users, Lock, Unlock, ArrowRight, ShieldCheck, MessageSquare, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -141,6 +142,18 @@ export default async function MePage({ params }: MePageProps) {
           hostNickname={session.host_nickname}
           selfLabel={session.self_label}
         />
+
+        {/* 評価・相互診断の関係マップ（相関図） */}
+        {answerCount > 0 && (
+          <PeerRelationNetwork
+            sessionId={sessionId}
+            hostNickname={session.host_nickname}
+            peerAnswers={peerAnswers}
+            peerSessionMap={peerSessionMap}
+            baseUrl={baseUrl}
+            isHostView={true}
+          />
+        )}
 
         {/* 回答者一覧 ＆ お返し相互診断カード */}
         <MutualDiagnosisCard

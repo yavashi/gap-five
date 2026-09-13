@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Sparkles, Users, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { RecentSessionCard } from '@/components/RecentSessionCard';
-import { SampleResultShowcase } from '@/components/SampleResultShowcase';
 
 export default function HomePage() {
   return (
@@ -62,14 +61,6 @@ export default function HomePage() {
 
         {/* 前回の診断復帰カード */}
         <RecentSessionCard />
-
-        {/* 診断結果サンプル（イラスト対比 ＆ レーダーチャート完備） */}
-        <div className="pt-2">
-          <div className="text-center pb-2">
-            <span className="text-xs font-bold text-slate-400">▼ 診断結果の見本イメージ</span>
-          </div>
-          <SampleResultShowcase />
-        </div>
 
         <footer className="pt-6 pb-2 text-center text-xs text-slate-400 space-x-3">
           <Link href="/privacy" className="hover:text-slate-600 hover:underline">

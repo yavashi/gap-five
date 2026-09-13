@@ -17,6 +17,7 @@ import { PairCompatibilityCard } from '@/components/PairCompatibilityCard';
 import { RecommendationCard } from '@/components/RecommendationCard';
 import { GapVisualCard } from '@/components/GapVisualCard';
 import { ResultTabContainer } from '@/components/ResultTabContainer';
+import { PeerRelationNetwork } from '@/components/PeerRelationNetwork';
 import { Sparkles, MessageSquare, Award, ArrowRight, ShieldAlert, CheckCircle2, Bookmark } from 'lucide-react';
 import { headers } from 'next/headers';
 
@@ -343,6 +344,18 @@ export default async function ResultPage({ params }: ResultPageProps) {
           }
           friendsContent={
             <>
+              {/* 評価・相互診断の関係相関マップ */}
+              {answerCount > 0 && (
+                <PeerRelationNetwork
+                  sessionId={sessionId}
+                  hostNickname={session.host_nickname}
+                  peerAnswers={peerAnswers}
+                  peerSessionMap={peerSessionMap}
+                  baseUrl={baseUrl}
+                  isHostView={isHost}
+                />
+              )}
+
               {/* 友人たちからの一言コメントカード群 */}
               {comments.length > 0 ? (
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">

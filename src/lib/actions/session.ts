@@ -145,43 +145,49 @@ export async function getPeerSessionMap(
       .in('host_nickname', uniquePeers)
       .order('created_at', { ascending: false });
 
+    const sessionMap: Record<string, string> = {};
     if (sessions && sessions.length > 0) {
-      const sessionMap: Record<string, string> = {};
       for (const s of sessions) {
         if (!sessionMap[s.host_nickname]) {
           sessionMap[s.host_nickname] = s.id;
         }
       }
+    }
 
-      const sessionIds = Object.values(sessionMap);
+    const sessionIds = Object.values(sessionMap);
+    let peerAnswersList: any[] = [];
+    if (sessionIds.length > 0) {
       const { data: peerAnswers } = await supabase
         .from('peer_answers')
         .select('session_id, peer_nickname')
         .in('session_id', sessionIds);
-
-      for (const peerName of uniquePeers) {
-        const pSessionId = sessionMap[peerName];
-        if (pSessionId) {
-          const answersForPSession = (peerAnswers || []).filter((a) => a.session_id === pSessionId);
-          const hostAnswered = answersForPSession.some((a) => {
-            const h = hostNickname.toLowerCase();
-            const p = a.peer_nickname.toLowerCase();
-            return p === h || p.includes(h) || h.includes(p);
-          });
-          result[peerName] = {
-            peerNickname: peerName,
-            sessionId: pSessionId,
-            hasAnswered: hostAnswered,
-            answerCount: answersForPSession.length,
-          };
-        } else {
-          result[peerName] = {
-            peerNickname: peerName,
-          };
-        }
+      if (peerAnswers) {
+        peerAnswersList = peerAnswers;
       }
-      return result;
     }
+
+    for (const peerName of uniquePeers) {
+      const pSessionId = sessionMap[peerName];
+      if (pSessionId) {
+        const answersForPSession = peerAnswersList.filter((a) => a.session_id === pSessionId);
+        const hostAnswered = answersForPSession.some((a) => {
+          const h = hostNickname.toLowerCase();
+          const p = (a.peer_nickname || '').toLowerCase();
+          return p === h || p.includes(h) || h.includes(p);
+        });
+        result[peerName] = {
+          peerNickname: peerName,
+          sessionId: pSessionId,
+          hasAnswered: hostAnswered,
+          answerCount: answersForPSession.length,
+        };
+      } else {
+        result[peerName] = {
+          peerNickname: peerName,
+        };
+      }
+    }
+    return result;
   }
 
   // インメモリフォールバック
@@ -193,9 +199,22 @@ export async function getPeerSessionMap(
         break;
       }
     }
+    let hostAnswered = false;
+    let answerCount = 0;
+    if (foundSessionId) {
+      const answers = memoryDb.peerAnswers.get(foundSessionId) || [];
+      answerCount = answers.length;
+      hostAnswered = answers.some((a) => {
+        const h = hostNickname.toLowerCase();
+        const p = (a.peer_nickname || '').toLowerCase();
+        return p === h || p.includes(h) || h.includes(p);
+      });
+    }
     result[peerName] = {
       peerNickname: peerName,
       sessionId: foundSessionId,
+      hasAnswered: hostAnswered,
+      answerCount,
     };
   }
 
